@@ -71,17 +71,20 @@ historical realism. Exact setup, checks, and runnable commands are in the
 
 ## Publication and CI
 
-The authorized F0b checkpoint targets existing `main` on `Su760/f1-pitwall`,
-without reset or force-push. Generated traces, virtual environments, caches,
+The F0b implementation checkpoint is
+[`625d00e5ed081b7968b8f9d3885cbf0e51e6fa14`](https://github.com/Su760/f1-pitwall/commit/625d00e5ed081b7968b8f9d3885cbf0e51e6fa14),
+pushed successfully to existing `main` on `Su760/f1-pitwall` without reset or
+force-push. Generated traces, virtual environments, caches,
 credentials, and the original spec download remain outside the commit.
 The [F0 workflow](../.github/workflows/ci.yml) now includes the F0b CLI demos
 alongside tests, Ruff, and packaging on Python 3.11 and 3.14.
 
-This evidence was written before publication. The handoff reports the exact
-commit, push, and hosted result; inspect the commit-specific
-[GitHub Actions run](https://github.com/Su760/f1-pitwall/actions) independently.
-Local verification and independent review are complete; they do not imply a
-hosted CI result before that run finishes.
+The implementation's [GitHub Actions run 37097220137](https://github.com/Su760/f1-pitwall/actions/runs/37097220137)
+passed on Python 3.11 and 3.14, with 203 tests in each job and all packaging,
+lint/format, comparison, and F0b demo steps successful. This documentation-only
+follow-up records that observed outcome and closes the task checklist. The final
+handoff identifies its own commit and hosted run separately. F0b is ready for
+independent review; no substantive correctness finding remains from this pass.
 
 ## Remaining limitations
 

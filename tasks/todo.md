@@ -69,7 +69,7 @@ Interfaces/ownership agreed before parallel implementation:
 - [x] Preserve comparison CLI and add optimize/replay/snapshot/restore/fork commands.
 - [x] Run focused and full checks; exercise CLI demos and obtain read-only review.
 - [x] Resolve substantive findings; update assumptions, decisions, README and status.
-- [ ] Inspect/stage intended changes, commit/push, and report exact hosted CI result.
+- [x] Inspect/stage intended changes, commit/push, and report exact hosted CI result.
 
 Snapshot policy memory: existing FixedSchedule policies are stateless; only those
 continuations are supported by CLI. Intentional branching creates a new trace;
@@ -81,3 +81,9 @@ candidates / 462 legal schedules, winner medium after lap 5 at 1113.550 s.
 Replay/restore/fork demos pass, including complete original/restored trace equality.
 Read-only reviewer found no substantive bug; independent action-tree enumeration
 matched counts and full rankings across 60 small configurations. No F0.5 work.
+
+Publication: implementation commit `625d00e5ed081b7968b8f9d3885cbf0e51e6fa14`
+pushed to `origin/main`; [hosted CI run 37097220137](https://github.com/Su760/f1-pitwall/actions/runs/37097220137)
+passed on Python 3.11 and 3.14 (203 tests each, checks and all CLI demos). This
+documentation-only follow-up records the result; the final handoff supplies its
+commit/push/CI outcome. Original downloaded spec and generated files remain local.
