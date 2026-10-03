@@ -1,5 +1,65 @@
 # PitWall Arena status
 
+## F0.5 — playable arena implemented and locally verified
+
+The milestone adds a local FastAPI + Next.js/TypeScript practice arena with three
+server-owned versioned synthetic challenges. The backend evaluates each legal
+call on an independent fork under the same stay-out continuation. The public
+contract is in [api-contract.md](api-contract.md); core equations, Observation,
+CLI, dependency lock and approved specification remain unchanged.
+
+Backend evidence on 2026-10-03: 203 preserved core tests plus 47 API/challenge
+tests pass on Python 3.14.2 and 3.11.14 (**250 each**). Ruff lint/format pass.
+The independent reviewer found no backend correctness issue and reproduced all
+ten legal outcomes with separate Decimal arithmetic. The tiny hand calculation
+has remaining times 26 s versus 23 s, giving 3 s excess time.
+
+| Challenge v1 | Legal remaining times (seconds)                          |
+| ------------ | -------------------------------------------------------- |
+| Closing laps | Hard 481.000; soft 483.800; medium 484.000; stay 500.500 |
+| Stint choice | Medium 368.400; soft 369.000; hard 375.600; stay 385.000 |
+| Final stint  | Hard 108.900; medium 109.200; stay/soft unavailable      |
+
+These are deterministic local comparisons under the disclosed continuation, not
+global optima or real F1 predictions. Parameter-intervention tests show that pit
+loss, warm-up and degradation affect the intended tradeoffs. Parent/sibling
+histories and observations remain unchanged by evaluated or rejected actions.
+
+Frontend source review found no substantive issue in server-derived scores,
+original-result preservation, stale-request guards, duplicate submission handling,
+or versioned local history. Browser inspection found joined words in the mobile
+rail heading/intro when the desktop line break was hidden. Explicit whitespace
+fixes it; the browser suite now checks the rendered text on both screen sizes.
+
+### F0.5 verification evidence — 2026-10-03
+
+| Check                                                                                               | Observed result                                              |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `.venv-api/bin/python -m pytest -q tests apps/api/tests`                                            | 250 passed (203 core + 47 API/challenge)                     |
+| Same suite in a separate Python 3.11.14 environment                                                 | 250 passed                                                   |
+| `.venv-api/bin/ruff check .` / `ruff format --check .`                                              | Passed; 39 Python files formatted                            |
+| `npm run lint` / `npm run typecheck` in `web/`                                                      | Passed                                                       |
+| `npm run build`                                                                                     | Passed; Next.js production build                             |
+| `npm run test:e2e`                                                                                  | 18 passed, Chromium desktop and mobile                       |
+| All three challenge calls, playback/replay, rewind/fork, history reload                             | Passed against real API and production application           |
+| Keyboard focus/Space/Enter, error/retry, duplicate clicks, stale responses, blocked/corrupt history | Passed                                                       |
+| Desktop/mobile briefing and comparison screenshots                                                  | Inspected; mobile text spacing fixed and regression verified |
+| Original comparison, optimize, replay, snapshot, restore, fork CLI demos                            | Passed; F0b results unchanged                                |
+| `npm audit --omit=dev`                                                                              | Zero production vulnerabilities                              |
+
+The isolated core Python dependency setup remains unchanged. Browser artifacts
+are generated under `web/test-results` and `web/playwright-report`; they stay out
+of Git and are uploaded by the new arena CI job. The existing Python 3.11/3.14
+core jobs and CLI checks remain. Publication and hosted CI are recorded in the
+handoff once the checkpoint is pushed.
+
+Independent read-only review covered scoring, state isolation, strict request
+boundaries, pre-submit redaction, asynchronous UI state, and the completed user
+flow. The reviewer reran 47 API tests, checked all ten outcomes with Decimal
+arithmetic, and inspected fresh desktop/mobile screenshots for all challenges.
+No substantive production finding remains. A test-only ambiguous paragraph
+locator was corrected, and all 18 browser cases then passed.
+
 ## F0a and F0b — implemented and locally verified
 
 F0a supplies the deterministic single-car engine, fixed policies, tire/race rules,
@@ -88,6 +148,15 @@ independent review; no substantive correctness finding remains from this pass.
 
 ## Remaining limitations
 
+- Arena scores compare one call followed by the disclosed stay-out continuation;
+  they are not whole-race optimality claims. Three fixed version-1 challenges are
+  supported. Playback is lap-level, and local history is browser-only practice.
+- Browser automation covered Chromium at desktop and iPhone-sized viewports,
+  not physical devices or Safari/Firefox. The service is for local use; deployment,
+  authentication and multi-user abuse controls remain deferred.
+- Full npm audit reports five development-tool entries for one unpatched `braces`
+  advisory in the Next lint dependency chain; production audit is clean. See
+  [the documented upstream limitation](decisions.md#2026-10-03--isolated-web-tooling-and-reproducible-browser-checks).
 - Parameters are synthetic, deterministic, and uncalibrated; there is no traffic,
   weather, uncertainty, or historical rule fidelity.
 - Search is bounded by explicit candidate/lap budgets and optimizes only the
@@ -102,11 +171,10 @@ independent review; no substantive correctness finding remains from this pass.
   this repository; no hook was changed or bypassed. Its proposed fix and evidence
   remain in [decisions](decisions.md#2026-10-02--global-stop-hook-diagnosis-unresolved-outside-project).
 
-## Next separate task: F0.5 (not started)
+## Next separate task after F0.5: F1 (not started)
 
-Build the minimal playable synthetic arena with three pit-call challenges and
-debriefs. A user must complete a challenge and compare an intentional fork with
-clearly disclosed assumed parameters. Reuse the verified engine, snapshots, and
-reference optimizer; design the player-facing loop in that separate task.
-Historical data/calibration, databases, Gymnasium, PyTorch, and RL remain later
-milestones. This pass stops at F0b.
+Build a historical importer and completeness/quality report for one proposed
+circuit. Select sessions from source metadata and expose unsupported fields;
+separate observed quantities from assumed simulator parameters before calibration.
+Do not add RL, accounts, live telemetry, or deployment to that bounded task.
+This pass stops at the local playable F0.5 milestone.

@@ -1,6 +1,6 @@
 # F0 model assumptions and rule conventions
 
-This document describes implemented F0a and F0b behavior under the approved
+This document describes implemented F0a, F0b, and F0.5 behavior under the approved
 [specification](project-spec.md). The spec's later mechanisms are planned;
 see [status](status.md) and [decisions](decisions.md) for the milestone boundary.
 
@@ -239,3 +239,62 @@ hard parameters were offset 0.25 s, slope 0.2 s/tire-lap, cap 0.3 s, warm-up
 
 Expected total: **412.1 s**. The engine and separate read-only reviewer reproduced
 these intervals and a legal finish. This is an arithmetic check, not calibration.
+
+## F0.5 playable challenge conventions
+
+Three versioned, server-owned synthetic fixtures exercise second-stop cost,
+compound choice, and the final compound requirement. Their titles do not reveal
+the winning action. Each fixture contains a saved version-1 snapshot with full
+history, validated through the existing restoration path. The core model and
+Observation dataclass are unchanged. Public assumed pit loss, base pace, tire
+curves, warm-up arrays and rules are disclosed separately in the challenge API.
+
+At the fixed decision boundary, the player chooses one engine action. All legal
+alternatives fork that same canonical parent and use continuation `stay-out-v1`:
+execute that call for the next interval, then stay out to finish. Fixtures are
+chosen so this continuation is legal for every action in the original engine
+mask. The final-compound fixture uses the boundary before the final lap, so
+staying out or fitting the already-used compound is unavailable; distinct
+available compounds remain meaningful legal alternatives.
+
+```text
+remaining_s(action) = finish_elapsed_s(action) - boundary_elapsed_s
+score_s(action) = remaining_s(action) - min(remaining_s(legal alternatives))
+fork_gap_s(lap) = alternative_cumulative_remaining_s(lap)
+                   - original_cumulative_remaining_s(lap)
+```
+
+Scores mean excess time within this disclosed synthetic model and fixed
+continuation. They are not global schedule optima, real-world F1 performance, or
+uncertainty-aware grades. Negative fork gaps mean the alternative is faster after
+the indicated completed lap; the chart starts at zero at the original boundary.
+Exact ties use engine action order: stay out, pit soft, pit medium, pit hard.
+
+Python aggregates the recorded remaining lap components into base, compound pace,
+degradation, warm-up, and incremental pit costs. Debrief deltas are selected minus
+best; fork deltas are alternative minus original. Common base pace cancels in
+paired comparisons. Fresh-set warm-up can differ by compound and only applies to
+new sets, so these fixtures permit meaningful warm-up and degradation tradeoffs.
+Display rounding never changes scores or simulation values. Component sums can
+differ by last-bit floating-point rounding from elapsed-time subtraction.
+
+All state, metrics, rankings, and future traces are generated in Python. A
+pre-submit payload exposes only current/past situation, original legal masks
+with reasons, the briefing, continuation, objective, and public assumptions.
+Client configurations, snapshots, scores, and optimizer requests are not accepted.
+At most four alternatives over fixtures with at most 20 total laps are evaluated.
+The request body is capped at 1024 bytes. This is a local stateless service, not
+a multi-user deployment or abuse-resistant hosted platform.
+
+Browser playback reveals complete lap intervals from the returned run; it is not
+a continuous vehicle-physics simulation. Rewind returns to the original boundary
+and evaluates a new independent call while retaining the first result. Browser
+history is local, version-keyed, user-editable practice, not benchmark evidence.
+
+The independent scoring test uses a three-lap race at boundary one, base 10 s,
+soft degradation 2 s per age-lap, and no compound requirement beyond one compound.
+Staying out costs `(10 + 2) + (10 + 4) = 26 s`. A fresh hard set has -1 s pace,
+2 s first-lap warm-up, zero degradation and a 3 s pit loss:
+`(10 - 1 + 2 + 3) + (10 - 1) = 23 s`. Thus staying out scores 3 s excess.
+This arithmetic is independent of the evaluator; fresh soft and medium yield
+25 s and 26 s respectively, so hard is the best of all four legal calls.

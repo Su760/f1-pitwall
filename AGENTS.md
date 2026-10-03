@@ -3,7 +3,7 @@
 Read `tasks/lessons.md`, `tasks/todo.md`, [the approved spec](docs/project-spec.md),
 [model assumptions](docs/model-assumptions.md), and [status](docs/status.md).
 Inspect Git status and preserve existing work. Work only on the authorized
-milestone; F0.5 requires a separate task. Record corrections in `tasks/lessons.md`.
+milestone; F1 requires a separate task. Record corrections in `tasks/lessons.md`.
 
 ## Setup and checks
 
@@ -22,6 +22,28 @@ pitwall scenarios/synthetic.json --trace-dir traces
 pitwall optimize scenarios/synthetic.json --output traces/optimal.json
 pitwall replay traces/optimal.json --scenario scenarios/synthetic.json
 ```
+
+The F0.5 web stack is separate from the stdlib-only core. See the
+[README](README.md#play-the-local-arena) for setup and two-terminal launch commands.
+The API environment installs both `requirements-dev.lock` and
+`apps/api/requirements.lock` with hashes; web uses `npm ci` in `web/`.
+
+```sh
+.venv-api/bin/python -m pytest -q tests apps/api/tests
+.venv-api/bin/ruff check .
+.venv-api/bin/ruff format --check .
+cd web
+npm run lint
+npm run typecheck
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+Playwright starts the production web server and API itself; ports 3000 and 8000
+must be free. Browser reports/screenshots, node_modules, .next, and environments
+stay outside Git. Versioned server-owned challenge snapshot fixtures are intended
+source inputs and are committed under `apps/api/fixtures`.
 
 ## Invariants
 
@@ -46,6 +68,15 @@ pitwall replay traces/optimal.json --scenario scenarios/synthetic.json
 - All circuit/tire parameters are synthetic assumptions supplied by configuration.
   Consistency checks do not establish realism. Search optimality applies only to
   the configured deterministic model, rules, and starting compound.
+- For the playable arena, follow [the API contract](docs/api-contract.md). Restore
+  canonical server fixtures; accept only challenge/version and typed actions.
+  Every alternative uses the same frozen continuation and independent history.
+  Score excess remaining time against evaluated calls, never claim global
+  optimality. Pre-submit responses exclude answers and future traces; relevant
+  synthetic assumptions are public and separate from engine Observation.
+- Keep original browser results intact when rewinding. All times, cost deltas,
+  rankings and chart gaps come from Python; frontend arithmetic only formats or
+  positions supplied data. Repeated versioned local attempts are practice.
 
 ## Workflow
 

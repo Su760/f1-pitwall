@@ -1,0 +1,5 @@
+{
+  "max_request_bytes": 1024,
+  "max_race_laps": 20,
+  "fixtures": ["closing-laps", "stint-choice", "final-stint"]
+}

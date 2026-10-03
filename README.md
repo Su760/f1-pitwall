@@ -1,12 +1,99 @@
 # PitWall Arena
 
-F0: a deterministic, lap-level dry-race simulator for one car on a synthetic
-circuit. It compares and exhaustively optimizes fixed pit schedules, verifies
-saved traces, restores snapshots, and forks independent continuations. Runtime
-dependencies: Python's standard library only.
+PitWall Arena is a local pit-call practice game backed by a deterministic,
+lap-level Python simulator. F0.5 adds three synthetic challenges: inspect the
+situation, commit a call, watch the remaining laps, read the measured cost
+breakdown, then rewind and compare an independent alternative.
+
+The headless F0 engine still compares and exhaustively optimizes fixed schedules,
+verifies saved traces, and restores/forks snapshots. Its runtime remains Python's
+standard library only. FastAPI and Next.js/TypeScript dependencies are isolated
+under `apps/api` and `web`.
 
 All parameters in `scenarios/synthetic.json` are **synthetic assumptions**, not
 historical F1 measurements or calibrated predictions.
+
+## Play the local arena
+
+Requirements: Python 3.11+ and Node.js 22.20.0 (the verified Node version), with
+npm. From the repository root, install the separate web/API environments:
+
+```sh
+cd ~/Desktop/F1/Pitwall
+python3 -m venv .venv-api
+.venv-api/bin/python -m pip install --require-hashes -r requirements-dev.lock -r apps/api/requirements.lock
+.venv-api/bin/python -m pip install --no-build-isolation --no-deps -e .
+cd web
+npm ci
+```
+
+Terminal 1, from the repository root:
+
+```sh
+.venv-api/bin/python -m uvicorn apps.api.app:app --host 127.0.0.1 --port 8000
+```
+
+Terminal 2:
+
+```sh
+cd ~/Desktop/F1/Pitwall/web
+npm run dev -- --hostname 127.0.0.1 --port 3000
+```
+
+Open [the arena](http://127.0.0.1:3000). Select a challenge, inspect its assumptions
+and legal calls, and commit one action. Playback reveals simulated lap records;
+skip or replay it, read the debrief, and use **Rewind this call** to compare a new
+call from the same original boundary. The original result stays intact.
+
+All legal calls use the same disclosed continuation: **stay out after this call
+until finish**. The score is excess remaining seconds against the best evaluated
+call within that synthetic model and continuation. It is not global optimality
+or real-world F1 performance. The debrief reports Python-calculated pit, pace,
+warm-up, and degradation costs. A negative comparison gap means the alternative
+is faster than the original after that completed lap.
+
+Practice history is stored only in this browser, keyed by challenge ID/version.
+Repeated attempts are practice; clearing browser storage removes the history.
+Unavailable or malformed local storage does not prevent play. No accounts,
+database, telemetry, or external race service is used.
+
+To run the production build locally (keep Terminal 1 running):
+
+```sh
+cd web # from the repository root
+npm run build
+npm run start -- --hostname 127.0.0.1 --port 3000
+```
+
+The browser uses same-origin API paths. The Next.js server proxies to
+`http://127.0.0.1:8000`; configure `PITWALL_API_URL` before dev/build if using another
+local API address, and use the same value when starting that production build.
+The API accepts only known challenge/version identifiers and
+actions, never client snapshots, configurations, or scores. See the
+[API contract](docs/api-contract.md) for fields, bounds, versions, and error semantics.
+
+## Arena checks
+
+With the dependencies above installed, stop any manually running servers on
+ports 3000/8000 before Playwright; its configuration starts both services itself.
+
+```sh
+# Repository root
+.venv-api/bin/python -m pytest -q tests apps/api/tests
+.venv-api/bin/ruff check .
+.venv-api/bin/ruff format --check .
+cd web
+npm run lint
+npm run typecheck
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+Playwright exercises the production app at desktop/mobile sizes, including all
+three challenges, independent alternatives, keyboard input, API failure/retry,
+and practice history. Its HTML report and screenshots are generated under `web/`
+and ignored by Git. On Linux CI, browser installation also uses `--with-deps`.
 
 ## Setup
 
@@ -203,6 +290,7 @@ The complete approved [project spec](docs/project-spec.md) is version 2.1. See
 [decisions](docs/decisions.md) for rationale and tooling findings, and
 [status](docs/status.md) for verification evidence and remaining work.
 
-F0a and F0b are implemented. Next is **F0.5**: a minimal playable synthetic arena,
-three pit-call challenges, debriefs, and a user-facing fork comparison. No UI,
-historical data, databases, uncertainty model, or learning framework is included.
+F0a, F0b, and the F0.5 local playable loop are implemented. The next bounded task
+is **F1**: a historical importer and completeness/quality report for one proposed
+circuit, before calibration or changing the synthetic model. Historical data,
+databases, uncertainty modeling, and learning frameworks are not included here.

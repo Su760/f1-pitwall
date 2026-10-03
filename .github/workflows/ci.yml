@@ -1,4 +1,4 @@
-name: F0 checks
+name: PitWall checks
 
 on: [push, pull_request]
 
@@ -36,3 +36,48 @@ jobs:
           pitwall fork traces/boundary4.json --pit 5:medium --name earlier-stop --output traces/forked.json
           pitwall replay traces/restored.json --scenario scenarios/synthetic.json
           pitwall replay traces/forked.json --scenario scenarios/synthetic.json
+
+  arena:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22.20.0"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install isolated API environment
+        run: |
+          python -m venv .venv-api
+          .venv-api/bin/python -m pip install --require-hashes -r requirements-dev.lock -r apps/api/requirements.lock
+          .venv-api/bin/python -m pip install --no-build-isolation --no-deps -e .
+      - name: Verify challenge scoring and API
+        run: .venv-api/bin/python -m pytest -q apps/api/tests
+      - name: Install pinned web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Check and build web application
+        working-directory: web
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run build
+      - name: Install Chromium
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+      - name: Play desktop and mobile challenges against production application
+        working-directory: web
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: arena-playwright-evidence
+          path: |
+            web/playwright-report/
+            web/test-results/
+          if-no-files-found: ignore

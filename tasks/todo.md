@@ -87,3 +87,55 @@ pushed to `origin/main`; [hosted CI run 37097220137](https://github.com/Su760/f1
 passed on Python 3.11 and 3.14 (203 tests each, checks and all CLI demos). This
 documentation-only follow-up records the result; the final handoff supplies its
 commit/push/CI outcome. Original downloaded spec and generated files remain local.
+
+# F0.5 — playable synthetic arena
+
+Authorized implementation, verification, documentation and commit/push. Baseline
+3fa643dfa7b637a61247db4a2a0adbc4dfa7851e; preserve the untracked original spec.
+The user explicitly directs implementation after recording the contract/plan.
+
+Scoped files/ownership:
+
+- Root: docs/api-contract.md; README, AGENTS, assumptions, decisions, status,
+  tasks/todo; .gitignore; .github/workflows/ci.yml; web/playwright.config.ts and
+  web/tests/** for end-to-end verification. Approved spec/core invariants unchanged.
+- Backend agent: apps/api/** (FastAPI app, stdlib challenge evaluator, server-owned
+  versioned snapshot fixtures, focused tests, separate pinned Python web lock).
+- Frontend agent: web/** except root-owned Playwright config/tests (Next.js,
+  TypeScript, CSS, public assets, exact package pins and npm lock).
+- Independent reviewer: read-only scoring/isolation/API and complete user-flow review.
+
+Design: three server-owned versioned challenges, one submitted action, then frozen
+stay-out continuation for every legal alternative. Reconstruct and fork trusted
+snapshots server-side. Public situation and assumptions are separate from unchanged
+engine Observation; no pre-submit rankings or future traces. Score is excess
+remaining seconds within this disclosed deterministic comparison. Same-origin
+Next.js proxy to local FastAPI; stateless API, browser-only version-keyed history.
+
+Visual plan: graphite timing-board base, warm white text, ice-blue information,
+red soft/yellow medium/white hard with explicit S/M/H labels. Distinct display
+and numeric typography. Challenge rail + broad decision board on desktop; stacked
+briefing/call/results on mobile. Playback shows lap-level timing, not vehicle
+physics. Rewind retains the first result and compares one independent alternative.
+
+- [x] Record API contract; verify official tooling docs and coordinate ownership.
+- [x] Implement fixtures, bounded challenge evaluation, strict API, and focused tests.
+- [x] Implement challenge/decision/playback/debrief/fork/history interface.
+- [x] Run core/API checks, frontend lint/type/build, and real Playwright flows.
+- [x] Inspect desktop/mobile screenshots and keyboard/error/retry behavior.
+- [x] Obtain independent review and resolve substantive findings.
+- [ ] Update documentation/evidence, inspect/stage, commit/push and check hosted CI.
+
+Boundaries: no historical data, RL, accounts, databases, live telemetry, deployment,
+optimizer endpoint, arbitrary client configuration/snapshots, or global hook changes.
+
+Local evidence (2026-10-03): 250 Python tests on both 3.14.2 and 3.11.14, Ruff
+lint/format, TypeScript, ESLint, production build, and 18 real desktop/mobile
+Playwright cases pass. All three challenges and independent rewind comparisons
+are playable; keyboard, errors/retry, duplicate/stale requests, and local history
+are covered. Desktop/mobile screenshots were inspected by root and reviewer.
+Mobile heading/intro whitespace was corrected and regression-tested. Independent
+review found no substantive scoring, isolation, API, or completed-flow defect;
+separate Decimal arithmetic matched all ten legal outcomes. Existing CLI demos
+retain their F0b results. Production npm audit is clean; one unpatched advisory
+in the development lint dependency chain is recorded in decisions/status.

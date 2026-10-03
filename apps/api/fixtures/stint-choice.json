@@ -1,0 +1,175 @@
+{
+  "id": "stint-choice",
+  "version": 1,
+  "title": "Stint choice",
+  "summary": "Four laps remain on a used soft set.",
+  "briefing": "You started on hard tires, changed to soft after lap two, and have four laps left. Compare compound pace, fresh-tire warm-up and age-based degradation before making the call.",
+  "objective": "Choose a call for the remaining four laps.",
+  "snapshot": {
+    "snapshot_version": 1,
+    "model_version": "f0a-linear-capped-v1",
+    "configuration_id": "f7c0df6f2b323e0db50115b5251f597d327d73401b780236a9060f427df65b26",
+    "configuration": {
+      "name": "Synthetic stint-choice v1",
+      "laps": 10,
+      "base_lap_time_s": 90,
+      "pit_loss_s": 5,
+      "start_compound": "hard",
+      "rules": {
+        "max_pit_stops": 2,
+        "min_distinct_compounds": 2
+      },
+      "tires": {
+        "soft": {
+          "pace_offset_s": -2,
+          "degradation_s_per_lap": 1.5,
+          "degradation_cap_s": 20,
+          "warmup_s": [3],
+          "fresh_sets": 2
+        },
+        "medium": {
+          "pace_offset_s": 0,
+          "degradation_s_per_lap": 0.4,
+          "degradation_cap_s": 12,
+          "warmup_s": [1],
+          "fresh_sets": 2
+        },
+        "hard": {
+          "pace_offset_s": 1,
+          "degradation_s_per_lap": 0.1,
+          "degradation_cap_s": 8,
+          "warmup_s": [4, 2],
+          "fresh_sets": 2
+        }
+      }
+    },
+    "state": {
+      "completed_laps": 6,
+      "current_compound": "soft",
+      "tire_age_laps": 4,
+      "remaining_sets": [1, 2, 1],
+      "used_compounds": ["soft", "hard"],
+      "pit_boundaries": [2],
+      "elapsed_s": 557.1
+    },
+    "actions": [
+      {
+        "after_lap": 0,
+        "action": "stay_out"
+      },
+      {
+        "after_lap": 1,
+        "action": "stay_out"
+      },
+      {
+        "after_lap": 2,
+        "action": "pit_soft"
+      },
+      {
+        "after_lap": 3,
+        "action": "stay_out"
+      },
+      {
+        "after_lap": 4,
+        "action": "stay_out"
+      },
+      {
+        "after_lap": 5,
+        "action": "stay_out"
+      }
+    ],
+    "laps": [
+      {
+        "lap": 1,
+        "compound": "hard",
+        "tire_age_laps": 0,
+        "base_lap_time_s": 90,
+        "pace_offset_s": 1,
+        "degradation_s": 0.0,
+        "warmup_s": 4,
+        "pit_loss_s": 0.0,
+        "lap_time_s": 95.0,
+        "elapsed_s": 95.0
+      },
+      {
+        "lap": 2,
+        "compound": "hard",
+        "tire_age_laps": 1,
+        "base_lap_time_s": 90,
+        "pace_offset_s": 1,
+        "degradation_s": 0.1,
+        "warmup_s": 2,
+        "pit_loss_s": 0.0,
+        "lap_time_s": 93.1,
+        "elapsed_s": 188.1
+      },
+      {
+        "lap": 3,
+        "compound": "soft",
+        "tire_age_laps": 0,
+        "base_lap_time_s": 90,
+        "pace_offset_s": -2,
+        "degradation_s": 0.0,
+        "warmup_s": 3,
+        "pit_loss_s": 5,
+        "lap_time_s": 96.0,
+        "elapsed_s": 284.1
+      },
+      {
+        "lap": 4,
+        "compound": "soft",
+        "tire_age_laps": 1,
+        "base_lap_time_s": 90,
+        "pace_offset_s": -2,
+        "degradation_s": 1.5,
+        "warmup_s": 0.0,
+        "pit_loss_s": 0.0,
+        "lap_time_s": 89.5,
+        "elapsed_s": 373.6
+      },
+      {
+        "lap": 5,
+        "compound": "soft",
+        "tire_age_laps": 2,
+        "base_lap_time_s": 90,
+        "pace_offset_s": -2,
+        "degradation_s": 3.0,
+        "warmup_s": 0.0,
+        "pit_loss_s": 0.0,
+        "lap_time_s": 91.0,
+        "elapsed_s": 464.6
+      },
+      {
+        "lap": 6,
+        "compound": "soft",
+        "tire_age_laps": 3,
+        "base_lap_time_s": 90,
+        "pace_offset_s": -2,
+        "degradation_s": 4.5,
+        "warmup_s": 0.0,
+        "pit_loss_s": 0.0,
+        "lap_time_s": 92.5,
+        "elapsed_s": 557.1
+      }
+    ],
+    "result": {
+      "total_elapsed_s": 557.1,
+      "completed_laps": 6,
+      "pit_boundaries": [2],
+      "stints": [
+        {
+          "compound": "hard",
+          "first_lap": 1,
+          "last_lap": 2
+        },
+        {
+          "compound": "soft",
+          "first_lap": 3,
+          "last_lap": 6
+        }
+      ],
+      "legal": false,
+      "legality_errors": ["Race is not finished"]
+    }
+  }
+}

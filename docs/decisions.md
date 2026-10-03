@@ -162,3 +162,98 @@ Primary docs checked: [argparse subcommands](https://docs.python.org/3/library/a
 
 The specification has no intentional design changes in F0b and remains unchanged.
 Next is the separate F0.5 playable synthetic arena, three challenges, and debriefs.
+
+## 2026-10-03 — F0.5 contract, scoring, and state ownership
+
+Use the approved FastAPI + Next.js/TypeScript stack with a small stateless API.
+Keep the Python engine authoritative and its Observation unchanged. The written
+[API contract](api-contract.md) was agreed before backend/frontend delegation;
+separate file ownership keeps the core and original spec intact.
+
+Each server-owned versioned fixture is a trusted saved decision boundary, restored
+through the existing verified prefix-replay path. Evaluate every original-mask
+legal action on an independent fork under one frozen stay-out continuation.
+Fixtures must permit that continuation for all legal choices; the mandatory
+compound fixture therefore uses the boundary before the last lap. This avoids
+an implicit future decision changing the meaning of the player's one-call score.
+
+Score selected remaining elapsed seconds minus the best evaluated remaining
+seconds. Keep exact ranking and report model/continuation scope; neither the UI
+nor API calls this global optimality or real F1 performance. Component totals and
+signed cumulative differences come from Python lap results. Tests include an
+independent hand calculation and parameter interventions that change the cost
+tradeoff, not just an assertion that the fixtures run.
+
+Disclose relevant assumed tire curves, pit loss and rules in a separate public
+payload. Do not disclose answers or future traces before a call. Reconstruct
+canonical state for every request; reject uploaded state/config/score and expose
+no optimizer endpoint. At most four rollouts over a 20-lap fixture, and a 1024-byte
+request cap, bound work. Versioned browser history is local practice, never
+server authority. No persistence service or external API is needed.
+
+## 2026-10-03 — isolated web tooling and reproducible browser checks
+
+The core dependency file remains unchanged. Pin Python web dependencies under
+`apps/api/requirements.in` and a hash-checked lock; install into `.venv-api`.
+Pin Next.js/React/TypeScript/ESLint/Playwright under `web/package.json`, committing
+npm's resolved lock and using `npm ci`. Use existing Node 22.20.0 for local/CI
+checks. Runtime UI fonts are local/system fonts, avoiding a remote font fetch
+requirement during production builds.
+
+FastAPI uses typed request validation with forbidden extra fields, plus strict
+JSON parsing and bounded body reads. Strict validation matters because normal
+coercion can reinterpret a boolean/string as a version number. Primary docs
+checked: [FastAPI request bodies](https://fastapi.tiangolo.com/tutorial/body/),
+[Pydantic strict mode](https://docs.pydantic.dev/latest/concepts/strict_mode/), and
+[Starlette request streams](https://starlette.dev/requests/).
+
+Next.js external rewrites keep browser requests on one origin and route to the
+local Python service. No permissive CORS or browser-visible backend secrets are
+needed. Current Next.js requires explicit linting separate from production builds;
+run ESLint, TypeScript, and build individually. Primary docs checked:
+[Next.js installation](https://nextjs.org/docs/app/getting-started/installation)
+and [rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites).
+
+Playwright starts both real servers and exercises the production build at desktop
+and mobile sizes. Tests use role/name locators and API-returned values, and check
+keyboard focus, errors/retry, duplicate submission, stale responses, and history.
+Screenshots are inspected as separate visual evidence; passing tests alone is not
+visual approval. Primary docs checked: [Playwright web servers](https://playwright.dev/docs/test-webserver)
+and [CI setup](https://playwright.dev/docs/ci-intro). GitHub Actions setup-node v7
+and upload-artifact v7 were verified against their official repository releases.
+
+The referenced global UI rules path was absent and no moved copy was found under
+the installed rule/agent directories. Repository guidance, the approved spec,
+and the requested accessible timing-board design remain the design basis.
+No global hooks or configuration were modified.
+
+The installed Starlette 1.7.0 TestClient deprecated its HTTPX integration; that
+warning was reproduced during backend tests. Follow the current
+[Starlette TestClient documentation](https://starlette.dev/testclient/) and pin
+HTTPX2 2.13.1 for API tests. FastAPI 0.142.2, Pydantic 2.13.5, and Uvicorn 0.54.0
+are separately pinned; no core dependency upgrade was required. This choice was
+verified 2026-10-03 against the installed API behavior and official documentation.
+
+Next's bundled React lint plugin calls context.getFilename, which ESLint 10
+removed. The initial lint run reproduced that exception. Pin ESLint 9.39.5,
+compatible with the plugin, and retain all configured rules. See the official
+[ESLint 10 migration guide](https://eslint.org/docs/latest/use/migrate-to-10.0.0).
+The mount fetch was expressed with an explicit response callback so asynchronous
+state updates satisfy the React effect rule while immediate challenge-switch
+resets remain in the user-event path. Lint and production build then passed.
+
+The full npm audit reports five development-dependency entries from the same
+unpatched braces<=3.0.3 issue in the Next lint dependency chain. The
+[upstream advisory GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+reports no patched release; registry latest is 3.0.3 (checked 2026-10-03). The offered
+automatic fix downgrades the Next lint configuration to a different major; do not
+apply it or disable linting. `npm audit --omit=dev` reports zero production
+vulnerabilities. Record the concrete development-tool limitation until an
+upstream compatible patch exists.
+
+Final browser verification found that hiding a desktop `<br>` on mobile joined
+adjacent JSX words. Add explicit whitespace and test rendered heading/intro text
+at both viewports. Fresh production-app checks then passed all 18 cases, with
+desktop/mobile screenshots inspected separately. The independent reviewer found
+no substantive scoring, state isolation, request-boundary, or completed-flow
+issue; a test-only ambiguous paragraph locator was narrowed to its intended text.
