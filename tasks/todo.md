@@ -124,7 +124,7 @@ physics. Rewind retains the first result and compares one independent alternativ
 - [x] Run core/API checks, frontend lint/type/build, and real Playwright flows.
 - [x] Inspect desktop/mobile screenshots and keyboard/error/retry behavior.
 - [x] Obtain independent review and resolve substantive findings.
-- [ ] Update documentation/evidence, inspect/stage, commit/push and check hosted CI.
+- [x] Update documentation/evidence, inspect/stage, commit/push and check hosted CI.
 
 Boundaries: no historical data, RL, accounts, databases, live telemetry, deployment,
 optimizer endpoint, arbitrary client configuration/snapshots, or global hook changes.
@@ -139,3 +139,10 @@ review found no substantive scoring, isolation, API, or completed-flow defect;
 separate Decimal arithmetic matched all ten legal outcomes. Existing CLI demos
 retain their F0b results. Production npm audit is clean; one unpatched advisory
 in the development lint dependency chain is recorded in decisions/status.
+
+Publication: implementation commit `afab41c7fc2642f184ffc1e0e938e7387d43cf54`
+pushed to `origin/main`. [CI run 37108789273](https://github.com/Su760/f1-pitwall/actions/runs/37108789273)
+passed both core Python jobs and the API/production-browser arena job, including
+all 18 browser cases. This documentation-only follow-up records the observed
+result; its final commit and CI are reported in the handoff. Generated artifacts
+and the original spec download remain outside Git. F0.5 stops here; F1 is separate.

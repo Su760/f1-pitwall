@@ -50,8 +50,7 @@ fixes it; the browser suite now checks the rendered text on both screen sizes.
 The isolated core Python dependency setup remains unchanged. Browser artifacts
 are generated under `web/test-results` and `web/playwright-report`; they stay out
 of Git and are uploaded by the new arena CI job. The existing Python 3.11/3.14
-core jobs and CLI checks remain. Publication and hosted CI are recorded in the
-handoff once the checkpoint is pushed.
+core jobs and CLI checks remain.
 
 Independent read-only review covered scoring, state isolation, strict request
 boundaries, pre-submit redaction, asynchronous UI state, and the completed user
@@ -59,6 +58,17 @@ flow. The reviewer reran 47 API tests, checked all ten outcomes with Decimal
 arithmetic, and inspected fresh desktop/mobile screenshots for all challenges.
 No substantive production finding remains. A test-only ambiguous paragraph
 locator was corrected, and all 18 browser cases then passed.
+
+F0.5 implementation commit
+[`afab41c7fc2642f184ffc1e0e938e7387d43cf54`](https://github.com/Su760/f1-pitwall/commit/afab41c7fc2642f184ffc1e0e938e7387d43cf54)
+was pushed to existing `main` without force-push. Its
+[GitHub Actions run 37108789273](https://github.com/Su760/f1-pitwall/actions/runs/37108789273)
+passed all three jobs: core Python 3.11 and 3.14 (203 tests each, lint, packaging,
+CLI demos), and the arena job (47 API tests, pinned install, lint/typecheck/build,
+18 production browser tests, uploaded evidence). This documentation follow-up
+records that result; the final handoff reports its own commit and CI separately.
+The approved spec and engine are unchanged, and the original untracked spec
+remains local. F0.5 is complete and ready for independent use/review.
 
 ## F0a and F0b — implemented and locally verified
 
