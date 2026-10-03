@@ -51,6 +51,11 @@ class Race:
         self._actions: list[ActionRecord] = []
 
     @property
+    def configuration(self) -> RaceConfig:
+        """Immutable evaluator configuration; deliberately absent from observations."""
+        return self._config
+
+    @property
     def state(self) -> RaceState:
         return self._state
 

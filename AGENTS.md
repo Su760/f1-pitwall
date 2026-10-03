@@ -3,7 +3,7 @@
 Read `tasks/lessons.md`, `tasks/todo.md`, [the approved spec](docs/project-spec.md),
 [model assumptions](docs/model-assumptions.md), and [status](docs/status.md).
 Inspect Git status and preserve existing work. Work only on the authorized
-milestone; F0b requires a separate task. Record corrections in `tasks/lessons.md`.
+milestone; F0.5 requires a separate task. Record corrections in `tasks/lessons.md`.
 
 ## Setup and checks
 
@@ -19,6 +19,8 @@ ruff check .
 ruff format --check .
 python -m pip wheel --no-build-isolation --no-deps . --wheel-dir dist
 pitwall scenarios/synthetic.json --trace-dir traces
+pitwall optimize scenarios/synthetic.json --output traces/optimal.json
+pitwall replay traces/optimal.json --scenario scenarios/synthetic.json
 ```
 
 ## Invariants
@@ -35,9 +37,15 @@ pitwall scenarios/synthetic.json --trace-dir traces
   make a legal finish impossible; retain terminal checks. Rejected actions must
   leave state, inventory, elapsed time, and trace unchanged.
 - Keep full float precision in state/traces. Round only for display; use tight
-  tolerances for totals computed in a different addition order. No randomness in F0a.
+  tolerances for totals computed in a different addition order. No randomness in F0.
+- Replay saved actions through the engine and verify all records. Restore snapshots
+  by validated prefix replay; never assign imported state. Fork histories must be
+  independent. Keep snapshots and optimizer results outside observations.
+- Call search exhaustive only after all candidates within explicit resource limits
+  have been evaluated. Rank full-precision times with documented deterministic ties.
 - All circuit/tire parameters are synthetic assumptions supplied by configuration.
-  Consistency checks do not establish realism or an optimum.
+  Consistency checks do not establish realism. Search optimality applies only to
+  the configured deterministic model, rules, and starting compound.
 
 ## Workflow
 

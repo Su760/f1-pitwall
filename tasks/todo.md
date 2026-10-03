@@ -45,3 +45,39 @@ Final local evidence: 80 tests on Python 3.14 and 3.11, lint/format, locked setu
 wheel build/install, and CLI demo pass. Independent reviewer found no engine bug;
 one precision test and existing trace-total assertions address the concrete gap.
 Global Stop-hook formatting fault reproduced; proposed fix documented, not applied.
+
+# F0b — exhaustive optimization, verified replay, snapshots, and forks
+
+Authorized: implement and verify F0b, independent review, commit/push. Preserve
+unrelated work and the untracked original spec. No UI, historical data, or RL.
+
+Interfaces/ownership agreed before parallel implementation:
+
+- Optimizer module: accepts RaceConfig and explicit search limits; enumerate all
+  stop counts/boundaries/compound sequences; score through simulate; return typed
+  ranked schedules/results, candidate/legal counts, completion and tie convention.
+- Replay/restore modules: retain version-1 traces; validate JSON/types/versions,
+  execute saved actions, compare all recorded fields; snapshots retain config,
+  state and action/lap prefix, restored only through validated replay. Expose
+  replay_document/load_trace, snapshot_document/save_snapshot/load_snapshot,
+  restore_snapshot and fork. No imported Python objects or observation changes.
+- Root: CLI integration, end-to-end tests, README, AGENTS, assumptions, decisions,
+  status, CI, final verification/publication. The approved spec stays unchanged.
+
+- [x] Implement bounded exhaustive optimizer and independent known-answer tests.
+- [x] Implement strict action replay, versioned snapshots, restoration, and forks.
+- [x] Preserve comparison CLI and add optimize/replay/snapshot/restore/fork commands.
+- [x] Run focused and full checks; exercise CLI demos and obtain read-only review.
+- [x] Resolve substantive findings; update assumptions, decisions, README and status.
+- [ ] Inspect/stage intended changes, commit/push, and report exact hosted CI result.
+
+Snapshot policy memory: existing FixedSchedule policies are stateless; only those
+continuations are supported by CLI. Intentional branching creates a new trace;
+changing an existing trace is a verification failure, not a replay feature.
+
+Local evidence: 203 tests pass on Python 3.14.2 and Python 3.11.14 (separate
+installed wheel); Ruff lint/format and wheel packaging pass. CLI derives 529
+candidates / 462 legal schedules, winner medium after lap 5 at 1113.550 s.
+Replay/restore/fork demos pass, including complete original/restored trace equality.
+Read-only reviewer found no substantive bug; independent action-tree enumeration
+matched counts and full rankings across 60 small configurations. No F0.5 work.

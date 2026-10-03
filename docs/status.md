@@ -1,95 +1,109 @@
 # PitWall Arena status
 
-## F0a — verified and ready for independent review
+## F0a and F0b — implemented and locally verified
 
-F0a includes the deterministic single-car engine, soft/medium/hard tire model,
-fixed schedules, CLI comparison, versioned audit traces, synthetic scenario,
-configuration validation, legality mask, and terminal rule checks. The runtime
-uses only the standard library. No F0b feature has been implemented.
+F0a supplies the deterministic single-car engine, fixed policies, tire/race rules,
+synthetic scenario, comparison CLI, and versioned traces. F0b adds exhaustive
+schedule optimization, verified action replay, versioned JSON snapshots,
+restoration, and independent forks. The runtime still uses only the standard
+library. The physical model and scenario parameters are unchanged.
 
-The approved version-2.1 [spec](project-spec.md) is copied in full from the root
-`PitWall-Arena-Project-Spec (1).md` download; the original remains untouched.
-The initial spec's October 2 checkpoint is historical; this status records the
-subsequent verification. [Decisions](decisions.md) records provenance and rationale.
+Reviewed F0a reference: `68b99c5d5dd79d470497ab8a8c942854503eecfb`, with 80 tests
+and passing GitHub Actions on Python 3.11 and 3.14. F0b builds on that history.
+The approved version-2.1 [spec](project-spec.md) remains unchanged and byte-identical
+to the original local download; historical checkpoint statements are preserved.
 
-## Verification evidence — 2026-10-02
+## F0b verification evidence — 2026-10-02
 
-| Check | Result |
-| --- | --- |
-| Baseline `python -m pytest -q` | 79 passed |
-| Final `python -m pytest -q`, Python 3.14.2 editable install | 80 passed |
-| Final tests, Python 3.11.14 separate environment / installed wheel | 80 passed |
-| `ruff check .` | Passed |
-| `ruff format --check .` | Passed |
-| Hash-locked pip setup and editable install from README | Passed |
-| `python -m pip wheel --no-build-isolation --no-deps . --wheel-dir dist` | Passed |
-| CLI demo and JSON audit | Both legal; totals unchanged |
-| Independent read-only source/test review | No confirmed engine correctness bugs |
-| Review of focused trace-test additions | 18 trace/CLI tests passed; no new findings |
+| Check                                                                   | Observed result                                            |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `python -m pytest -q`, Python 3.14.2 editable install                   | 203 passed                                                 |
+| Same suite, Python 3.11.14 separate environment / installed wheel       | 203 passed                                                 |
+| Optimizer tests                                                         | 30 passed                                                  |
+| Replay and snapshot/fork tests                                          | 82 passed                                                  |
+| New CLI tests plus existing trace/CLI tests                             | 29 passed                                                  |
+| `ruff check .`                                                          | Passed                                                     |
+| `ruff format --check .`                                                 | Passed                                                     |
+| `python -m pip wheel --no-build-isolation --no-deps . --wheel-dir dist` | Passed                                                     |
+| Hash-locked setup and wheel install in separate Python 3.11 environment | Passed                                                     |
+| Comparison, optimization, replay, snapshot, restore, fork CLI demos     | Passed                                                     |
+| Restored complete trace versus original JSON document                   | Identical                                                  |
+| Independent read-only engine/optimizer/replay/test review               | No substantive findings                                    |
+| Independent action-tree reference versus optimizer                      | Counts and full rankings match for 60 small configurations |
 
-Only test coverage changed: the existing trace test now checks cumulative/final
-elapsed time, and a new two-lap case confirms full precision survives display
-rounding. Production simulator code was preserved. Existing tests cover boundary
-and tire indexing, single pit charging, same-compound sets, stop and inventory
-limits, mandatory compounds, impossible/nonfinite inputs, atomic rejection, and
-no post-finish action. Repeated identical CLI runs retain identical trace bytes.
+Tests preserve the 80 F0a checks and add 123 focused F0b cases. They verify exact
+search counts/ranking, resource rejection before scoring, interruption without a
+completed search, same-compound replacement, alternative starting compounds, and
+a tiny hand-calculated optimum. Replay checks saved actions rather than executing
+FixedSchedule; corrupt components, metadata, types, versions, boundaries, final
+results, duplicate fields, and nonfinite values are rejected.
 
-Independent hand accounting: intervals `[81, 81, 88.6, 80.7, 80.8]` total
-**412.1 s**, matching the engine with a pit after lap 2. The full calculation is
-in [model assumptions](model-assumptions.md#independent-accounting-check-2026-10-02).
-The demo pit after lap 6 leaves soft tires on lap 6, then fits medium at age zero
-for lap 7 and charges 18 s once on that interval.
+Restoration tests cover reset, before a pit, after a pit, before the final lap,
+and finish. Identical continuation reproduces the whole trace. Parent/two-child
+fork tests compare state, observations, elapsed time and history after changed
+and rejected actions. Invented but superficially legal state is rejected by
+prefix replay. No substantive review finding required a production-code fix.
+
+## Verified synthetic results
 
 ```text
-Strategy | Total elapsed (s) | Pit after laps | Tire stints | Legality
-one-stop | 1113.850 | 6 | soft 1-6; medium 7-12 | LEGAL
-two-stop | 1124.700 | 4,8 | soft 1-4; medium 5-8; soft 9-12 | LEGAL
+529 candidates; 462 legal schedules (0 zero-stop, 22 one-stop, 440 two-stop)
+Rank | Total elapsed (s) | Gap (s) | Pit after lap:compound
+1 | 1113.550 | 0.000 | 5:medium
+2 | 1113.850 | 0.300 | 6:medium
+3 | 1114.500 | 0.950 | 4:medium
+4 | 1115.050 | 1.500 | 5:hard
+5 | 1115.300 | 1.750 | 4:hard
 ```
 
-Run `pitwall scenarios/synthetic.json --trace-dir traces` after the
-[README setup](../README.md#setup). Generated traces stay outside Git.
-The 10.850 s difference compares these two schedules only, not an optimum.
+The unique winner improves the existing one-stop baseline by **0.300 s**.
+The original comparison remains **1113.850 s** (medium after 6) versus
+**1124.700 s** (medium after 4, soft after 8), both legal. A boundary-4 restoration
+with the original continuation reproduces 1113.850 s and the entire trace;
+a deliberate fork to medium after 5 yields 1113.550 s without changing the parent.
+The separate four-lap arithmetic fixture has six legal totals
+`[406, 408, 415, 417, 418, 420]` seconds, reproduced by the search.
 
-## GitHub checkpoint and CI
+These results are derived from the engine and hand calculations, not a claim of
+historical realism. Exact setup, checks, and runnable commands are in the
+[README](../README.md); conventions and independent accounting are in
+[model assumptions](model-assumptions.md).
 
-Local `main` had no commits, and `git ls-remote origin` plus GitHub repository
-metadata confirmed an empty remote before publication. The authorized handoff
-publishes an initial checkpoint to `Su760/f1-pitwall` on `main`, without resets or
-force-pushes. Only intended source, tests, scenario, configuration, lockfile, and
-project documentation are staged; the downloaded original spec is preserved
-locally outside the canonical committed copy.
+## Publication and CI
 
-The [F0a workflow](../.github/workflows/ci.yml) runs on Python 3.11 and 3.14.
-Both action references were verified to exist. Local results above do not imply
-hosted success: use the exact commit/push result in the handoff and the
-[GitHub Actions run](https://github.com/Su760/f1-pitwall/actions) for remote status.
-At preparation of this checkpoint, hosted CI had not yet run.
+The authorized F0b checkpoint targets existing `main` on `Su760/f1-pitwall`,
+without reset or force-push. Generated traces, virtual environments, caches,
+credentials, and the original spec download remain outside the commit.
+The [F0 workflow](../.github/workflows/ci.yml) now includes the F0b CLI demos
+alongside tests, Ruff, and packaging on Python 3.11 and 3.14.
 
-## Separate tooling issue and limitations
+This evidence was written before publication. The handoff reports the exact
+commit, push, and hosted result; inspect the commit-specific
+[GitHub Actions run](https://github.com/Su760/f1-pitwall/actions) independently.
+Local verification and independent review are complete; they do not imply a
+hosted CI result before that run finishes.
 
-The global Stop-hook output bug remains outside this repository. Its echo-only
-command returned plain text with exit 0, violating the installed Codex 0.160.0
-contract. The proposed formatting-only fix preserves the reminder as JSON
-`systemMessage`. No global/plugin hooks were changed or bypassed. Original-event
-logs were unavailable; the active command reproduces the fault. See the
-[diagnosis](decisions.md#2026-10-02--global-stop-hook-diagnosis-unresolved-outside-project).
-This is separate from simulator correctness and test results.
+## Remaining limitations
 
-Parameters are assumed, not calibrated; no historical rule fidelity or real-race
-predictive performance is claimed. Traces are audit records, not restorable
-snapshots. The observation payload is the minimal F0a fixed-policy interface;
-planned pace estimates/history and policy memory are not implemented. Multi-file
-trace output is not a filesystem transaction. No known F0a engine correctness
-finding remains from this review.
+- Parameters are synthetic, deterministic, and uncalibrated; there is no traffic,
+  weather, uncertainty, or historical rule fidelity.
+- Search is bounded by explicit candidate/lap budgets and optimizes only the
+  configured starting compound. It is a reference for small fixed models.
+- Exact replay supports trace schema 1 and the current model only. It verifies
+  consistency, not artifact authenticity; changed inputs require a new run.
+- Snapshots store full history and restore by replay. Fixed policies are stateless;
+  future policy memory, random generators, and external processes are not saved.
+- Observations remain the minimal fixed-policy interface. No evaluator or
+  snapshot data was added to them. JSON output is not crash-atomic.
+- The previously diagnosed global Stop-hook formatting fault remains outside
+  this repository; no hook was changed or bypassed. Its proposed fix and evidence
+  remain in [decisions](decisions.md#2026-10-02--global-stop-hook-diagnosis-unresolved-outside-project).
 
-## Next separate task: F0b (not started)
+## Next separate task: F0.5 (not started)
 
-1. Exhaustive legal schedule optimization, with a tiny independently calculated
-   optimum and deterministic tie handling.
-2. Verified replay of versioned saved actions with incompatible inputs rejected.
-3. Snapshot restoration and continuation that reproduce the original trace.
-4. Independent forks that cannot mutate their parent or sibling states.
-
-F0b completes the remaining F0 gate. F0.5 playable challenges follow afterward.
-Historical data/calibration, uncertainty, UI, databases, Gymnasium, PyTorch, and
-training remain later milestones. This verification pass stops at F0a.
+Build the minimal playable synthetic arena with three pit-call challenges and
+debriefs. A user must complete a challenge and compare an intentional fork with
+clearly disclosed assumed parameters. Reuse the verified engine, snapshots, and
+reference optimizer; design the player-facing loop in that separate task.
+Historical data/calibration, databases, Gymnasium, PyTorch, and RL remain later
+milestones. This pass stops at F0b.

@@ -1,4 +1,4 @@
-name: F0a checks
+name: F0 checks
 
 on: [push, pull_request]
 
@@ -27,3 +27,12 @@ jobs:
       - run: ruff format --check .
       - run: python -m pip wheel --no-build-isolation --no-deps . --wheel-dir dist
       - run: pitwall scenarios/synthetic.json --trace-dir traces
+      - name: Verify optimization, replay, restoration, and branching
+        run: |
+          pitwall optimize scenarios/synthetic.json --output traces/optimal.json
+          pitwall replay traces/optimal.json --scenario scenarios/synthetic.json
+          pitwall snapshot traces/01.json --after-lap 4 --output traces/boundary4.json
+          pitwall restore traces/boundary4.json --pit 6:medium --name one-stop --output traces/restored.json
+          pitwall fork traces/boundary4.json --pit 5:medium --name earlier-stop --output traces/forked.json
+          pitwall replay traces/restored.json --scenario scenarios/synthetic.json
+          pitwall replay traces/forked.json --scenario scenarios/synthetic.json

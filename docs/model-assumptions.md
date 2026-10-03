@@ -1,6 +1,6 @@
-# F0a model assumptions and rule conventions
+# F0 model assumptions and rule conventions
 
-This document describes implemented F0a behavior under the approved
+This document describes implemented F0a and F0b behavior under the approved
 [specification](project-spec.md). The spec's later mechanisms are planned;
 see [status](status.md) and [decisions](decisions.md) for the milestone boundary.
 
@@ -117,12 +117,13 @@ boundaries. Fixed policies never substitute another action to repair a schedule.
 The engine uses Python floating-point arithmetic in a fixed operation order,
 without random or clock inputs. Repeated identical inputs on the same runtime
 produce identical results and JSON bytes. CLI times are rounded to three decimal
-places for display; traces keep full floating-point values. Cross-language or
-future model-version comparisons should allow numeric tolerance.
+places for display; traces keep full floating-point values. Verification requires
+the exact supported model and values; cross-language/future-model approximate
+comparisons are not part of the replay contract.
 
 Elapsed time accumulates sequentially without per-lap rounding. A different
 summation algorithm may differ by floating-point rounding at the last few bits;
-the trace checks use absolute tolerances of 1e-10 seconds for cumulative totals
+the independent accounting tests use absolute tolerances of 1e-10 seconds for cumulative totals
 and 1e-12 seconds for the small precision fixture. Displaying 210.000 s does not
 discard a trace value of 210.000246 s.
 
@@ -139,14 +140,87 @@ Each JSON trace contains:
 
 Action and lap arrays are aligned: action `after_lap: 6` corresponds to the
 lap record `lap: 7`. Both sides of the decision boundary are therefore explicit
-without changing the version-1 schema. This audit trace is not a saved snapshot.
+without changing the version-1 schema. Complete traces and partial snapshots
+have distinct schemas.
 
 There are no timestamps, machine paths, or random identifiers in trace contents.
 Schema and model versions are separate so a future equation change can be
-distinguished from a storage-format change. Configuration plus accepted actions
-supports future replay; F0a tests rerun fixed schedules from their initial
-configuration. Loading/restoring a running snapshot and forking state are not
-implemented.
+distinguished from a storage-format change. F0b explicitly supports the original
+F0a version-1 trace and model version without changing their meaning. Replay
+executes saved actions, not reconstructed policy decisions. It validates exact
+versions, configuration, consecutive action boundaries, legal actions, all lap
+fields, cumulative time, stints, terminal legality, and final results. Strategy
+metadata must describe the same pit decisions as the accepted action history.
+
+JSON objects reject duplicate and unknown fields. Arrays, strings, booleans,
+integer counters, and enums must have their expected types. Finite numeric time
+values can be integer or floating-point JSON numbers, but never booleans. NaN,
+infinity, and overflowing exponent notation are rejected. Values must equal the
+engine's repeated calculation exactly: externally rounded/edited records are
+not accepted with a tolerance. This differs from independent arithmetic tests
+whose summation order may differ.
+
+## Exhaustive search
+
+Let `N` be race laps and `K = min(max_pit_stops, N-1)`. The search space contains
+`sum(C(N-1, k) * 3**k for k in 0..K)` candidates. It includes all increasing pit
+boundary tuples, all three compounds at each stop (including the current one),
+and zero stops. The starting compound stays fixed. Engine simulation and terminal
+legality determine which candidates are legal; no alternate scoring formula or
+inventory approximation is used.
+
+Default explicit operational limits are 100,000 candidates and 2,000,000 potential
+lap evaluations (`candidate_count * N`). Preflight checks both before simulation.
+SearchLimits/CLI flags can override them. No truncation or timeout produces an
+exhaustive result. Completion is reported only after enumeration ends; interrupted
+searches propagate interruption and unsupported searches raise SearchTooLarge.
+
+Full-precision elapsed time orders results. Exact ties use fewer stops, then the
+lexicographic boundary tuple, then compound order soft, medium, hard. Only the
+requested top `k` full results are retained; all candidates are evaluated. Gaps
+are unrounded differences from the winner. The bounded reference search assumes
+complete knowledge of this fixed synthetic model and stays outside observations.
+
+For the unchanged 12-lap arena, candidate counts are `1 + 33 + 495 = 529`.
+Zero stops cannot satisfy two compounds; each of 11 one-stop boundaries permits
+medium or hard, giving 22. Each of 55 two-boundary combinations has eight legal
+compound sequences; soft/soft would consume three soft sets, so 440 are legal.
+Total: **462**. The unique optimum fits medium after lap 5 at **1113.550 s**.
+The after-lap-6 baseline is **0.300 s** slower.
+
+The four-lap independent optimum test uses base 100 s, pit loss 3 s, at most one
+stop, soft slope 4 s/lap, medium slope 1 s/lap, hard offset 5 s, and no warm-up.
+Caps do not bind. Medium after lap 1 totals `100 + 103 + 101 + 102 = 406 s`.
+Medium after 2/3 totals 408/415; hard after 1/2/3 totals 418/417/420. The engine
+search reproduces all six legal totals and the unique 406 s winner.
+
+## Snapshots, continuation, and independent forks
+
+Snapshot version 1 stores model version, full configuration, a configuration ID,
+current state, all accepted actions/laps from reset, and a partial/final result.
+The ID is SHA-256 of sorted, compact JSON containing model version and configuration.
+It identifies the exact serialized configuration, not authenticity or a signature.
+Optional expected configuration checks reject incompatible callers' inputs.
+
+Restoration always creates a fresh Race and replays the validated action prefix,
+then compares every state/result field. It never trusts imported inventory, age,
+elapsed time, or terminal legality alone. Reset, pre-pit, post-pit, pre-final-lap,
+and finished boundaries are supported. A post-pit step has already completed the
+new tire's first lap; there is no separate transient pit-in-progress state.
+Cost/storage grow with history length; no arbitrary object serialization is used.
+
+`fork(race)` uses the same validated restoration path and creates independent
+action/lap lists. Immutable configuration/state values can safely be shared.
+Accepted/rejected actions in one child cannot change the parent or siblings.
+An intentional new continuation creates new records; modifying a saved trace
+does not bypass replay verification. Observations contain no snapshots, history
+serialization, optimizer results, or hidden model parameters.
+
+FixedSchedule policies are stateless. Snapshots do not serialize policy objects
+or memory; the caller supplies future actions/policy after restoration. CLI
+restore/fork builds a fixed continuation from the remaining `--pit` arguments
+and derives complete strategy metadata from actual accepted actions. Reusing
+the original name and continuation reproduces the full original trace.
 
 ## Independent accounting check (2026-10-02)
 

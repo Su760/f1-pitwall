@@ -1,6 +1,5 @@
-"""Versioned audit traces. No timestamps, hidden state, or snapshot restoration."""
+"""Version-1 audit traces, compatible with the original F0a JSON representation."""
 
-import json
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -8,6 +7,7 @@ from typing import Any
 from pitwall.config import RaceConfig
 from pitwall.policies import FixedSchedule
 from pitwall.results import RaceResult
+from pitwall.serialization import MODEL_VERSION, json_value, write_document
 
 
 def trace_document(
@@ -18,18 +18,18 @@ def trace_document(
     summary = asdict(result)
     actions = summary.pop("actions")
     laps = summary.pop("laps")
-    return {
-        "trace_version": 1,
-        "model_version": "f0a-linear-capped-v1",
-        "configuration": config.to_dict(),
-        "strategy": asdict(strategy),
-        "actions": actions,
-        "laps": laps,
-        "result": summary,
-    }
+    return json_value(
+        {
+            "trace_version": 1,
+            "model_version": MODEL_VERSION,
+            "configuration": config.to_dict(),
+            "strategy": asdict(strategy),
+            "actions": actions,
+            "laps": laps,
+            "result": summary,
+        }
+    )
 
 
 def save_trace(path: Path, config: RaceConfig, strategy: FixedSchedule, result: RaceResult) -> None:
-    text = json.dumps(trace_document(config, strategy, result), indent=2, allow_nan=False) + "\n"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    write_document(path, trace_document(config, strategy, result))
