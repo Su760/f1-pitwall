@@ -1,0 +1,47 @@
+{
+  "scenario_version": 1,
+  "configuration": {
+    "name": "Synthetic Arena — illustrative assumptions",
+    "laps": 12,
+    "base_lap_time_s": 90.0,
+    "pit_loss_s": 18.0,
+    "start_compound": "soft",
+    "rules": {
+      "max_pit_stops": 2,
+      "min_distinct_compounds": 2
+    },
+    "tires": {
+      "soft": {
+        "pace_offset_s": -1.0,
+        "degradation_s_per_lap": 0.8,
+        "degradation_cap_s": 6.0,
+        "warmup_s": [1.0, 0.3],
+        "fresh_sets": 2
+      },
+      "medium": {
+        "pace_offset_s": 0.0,
+        "degradation_s_per_lap": 0.45,
+        "degradation_cap_s": 4.0,
+        "warmup_s": [1.4, 0.4],
+        "fresh_sets": 2
+      },
+      "hard": {
+        "pace_offset_s": 0.7,
+        "degradation_s_per_lap": 0.25,
+        "degradation_cap_s": 3.0,
+        "warmup_s": [2.0, 0.6],
+        "fresh_sets": 2
+      }
+    }
+  },
+  "strategies": [
+    { "name": "one-stop", "stops": [{ "after_lap": 6, "compound": "medium" }] },
+    {
+      "name": "two-stop",
+      "stops": [
+        { "after_lap": 4, "compound": "medium" },
+        { "after_lap": 8, "compound": "soft" }
+      ]
+    }
+  ]
+}
