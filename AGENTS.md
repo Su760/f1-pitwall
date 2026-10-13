@@ -3,7 +3,7 @@
 Read `tasks/lessons.md`, `tasks/todo.md`, [the approved spec](docs/project-spec.md),
 [model assumptions](docs/model-assumptions.md), and [status](docs/status.md).
 Inspect Git status and preserve existing work. Work only on the authorized
-milestone; F1 requires a separate task. Record corrections in `tasks/lessons.md`.
+milestone; F2 requires a separate task. Record corrections in `tasks/lessons.md`.
 
 ## Setup and checks
 

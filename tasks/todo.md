@@ -188,8 +188,7 @@ Each owner adds focused offline regression fixtures for these boundaries.
 - [x] Independently review and resolve substantive findings with regression tests.
 - [x] Verify preserved core/API/arena and relevant packaging/lint checks.
 - [x] Record identities, coverage, readiness/blockers and exact reproduction commands.
-- [ ] Inspect diff/staging, commit/push scoped changes and verify pushed-commit CI.
-
+- [x] Inspect diff/staging, commit/push scoped changes and verify pushed-commit CI.
 
 F1 local evidence: 100 offline historical tests, 203 preserved core tests (303
 combined and from final installed wheel), 250 core/API tests, 18 production-browser
@@ -204,3 +203,10 @@ blocked; 2025 driver 27 completed-lap result is null. Two real snapshots retain
 identical hashes for all 27 responses. Final two offline builds preserve all 3,316
 lap rows and are byte-identical across 12 files. Exact identities, counts, caveats,
 hashes and reproduction commands are in docs/status.md. No F2 work performed.
+
+Publication: implementation commit `496f02ef3609ce90c7a390dff6da4c66c666aed0`
+pushed to origin/main without force. [CI run 38441425578](https://github.com/Su760/f1-pitwall/actions/runs/38441425578)
+passed all four jobs: historical, core Python 3.11/3.14 and playable arena.
+This documentation-only follow-up records that verified outcome; its exact
+commit/CI are supplied in the final handoff. Source readiness remains limited
+and the circuit quality gate blocked; CI does not certify historical completeness.

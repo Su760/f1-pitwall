@@ -14,11 +14,11 @@ Existing local `web/next-env.d.ts` edits and the downloaded spec are preserved.
 Metadata resolved all three candidates to circuit **63 / Sakhir**, country Bahrain,
 session Race. Dates and keys below are returned source values, not invented IDs.
 
-| Year / race date (UTC) | Session / meeting | Drivers | Source lap rows / positive timed | Stints | Pit rows | Control / weather | Result rows |
-| --- | --- | ---: | ---: | ---: | --- | ---: | ---: |
-| 2023-03-05 | 7953 / 1141 | 20 | 1058 / 1055 | 70 | unavailable: HTTP 404 | 75 / 161 | 20 |
-| 2024-03-02 | 9472 / 1229 | 20 | 1129 / 1129 | 63 | 43 | 71 / 157 | 20 |
-| 2025-04-13 | 10014 / 1257 | 20 | 1129 / 1128 | 62 | 42 | 93 / 158 | 20 |
+| Year / race date (UTC) | Session / meeting | Drivers | Source lap rows / positive timed | Stints | Pit rows              | Control / weather | Result rows |
+| ---------------------- | ----------------- | ------: | -------------------------------: | -----: | --------------------- | ----------------: | ----------: |
+| 2023-03-05             | 7953 / 1141       |      20 |                      1058 / 1055 |     70 | unavailable: HTTP 404 |          75 / 161 |          20 |
+| 2024-03-02             | 9472 / 1229       |      20 |                      1129 / 1129 |     63 | 43                    |          71 / 157 |          20 |
+| 2025-04-13             | 10014 / 1257      |      20 |                      1129 / 1128 |     62 | 42                    |          93 / 158 |          20 |
 
 Both real bounded imports made 27 requests. The sole failed endpoint is
 `https://api.openf1.org/v1/pit?session_key=7953`, returning **HTTP 404** with
@@ -50,14 +50,14 @@ Counts below are eligible rows after documented exclusions, not a calibration
 sample recommendation. Every non-blocked purpose is still **limited** by the
 partial candidate-set source audit and any local blockers in `quality.json`.
 
-| Purpose | 2023 | 2024 | 2025 |
-| --- | --- | --- | --- |
-| Descriptive lap/stint rows | limited: 955 / 1058 | limited: 1129 / 1129 | limited: 1128 / 1129 |
-| Dry-pace investigation candidates | limited: 258 / 1058 | blocked: 0 / 1129 | limited: 404 / 1129 |
-| Pit-lane duration description | blocked: source unavailable | limited: 43 / 43 | limited: 42 / 42 |
-| Stationary-stop description | blocked: source unavailable | blocked: 0 / 43 | limited: 40 / 42 |
-| Incremental race-time pit loss | blocked: no counterfactual measurement | blocked | blocked |
-| Decision-time features | blocked: publication times/delays unverified | blocked | blocked |
+| Purpose                           | 2023                                         | 2024                 | 2025                 |
+| --------------------------------- | -------------------------------------------- | -------------------- | -------------------- |
+| Descriptive lap/stint rows        | limited: 955 / 1058                          | limited: 1129 / 1129 | limited: 1128 / 1129 |
+| Dry-pace investigation candidates | limited: 258 / 1058                          | blocked: 0 / 1129    | limited: 404 / 1129  |
+| Pit-lane duration description     | blocked: source unavailable                  | limited: 43 / 43     | limited: 42 / 42     |
+| Stationary-stop description       | blocked: source unavailable                  | blocked: 0 / 43      | limited: 40 / 42     |
+| Incremental race-time pit loss    | blocked: no counterfactual measurement       | blocked              | blocked              |
+| Decision-time features            | blocked: publication times/delays unverified | blocked              | blocked              |
 
 Dry-pace exclusions affect **800**, **1129**, and **725** distinct source rows;
 per-reason counts overlap and are preserved with source references. No wet-condition
@@ -134,8 +134,23 @@ added `max_lap_number` audit bound; rebuilding it requires the explicit current
   pit timestamps, extreme-value bounds, and failed metadata request summaries.
   Scoped final review approved; 99 historical tests passed independently before
   the final narrow classifier review (35 quality tests rerun for that check).
-- Hosted publication/CI are recorded separately below after pushing the checkpoint;
-  local verification and source availability do not imply a hosted CI result.
+- Hosted publication/CI are recorded separately below; passing CI does not certify
+  historical completeness or remove the source/analysis blockers.
+
+### F1 publication and hosted CI
+
+Implementation commit
+[`496f02ef3609ce90c7a390dff6da4c66c666aed0`](https://github.com/Su760/f1-pitwall/commit/496f02ef3609ce90c7a390dff6da4c66c666aed0)
+was pushed to `origin/main` without force. [CI run 38441425578](https://github.com/Su760/f1-pitwall/actions/runs/38441425578)
+completed successfully for all four jobs: the isolated historical offline suite,
+core Python 3.11/3.14 checks and CLI demos, and API/production-browser arena.
+The initial status monitor encountered a transient GitHub connection reset;
+the subsequent run query confirmed `completed / success` for every job.
+
+This documentation-only follow-up records that observed result and closes the
+task checklist. Its own commit and hosted CI are reported in the final handoff.
+The quality gate remains blocked as reported above. No F2 work is authorized by
+this checkpoint, and no generated historical datasets/reports enter Git.
 
 ## F0.5 — playable arena implemented and locally verified
 
