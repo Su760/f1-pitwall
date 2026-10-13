@@ -257,3 +257,55 @@ at both viewports. Fresh production-app checks then passed all 18 cases, with
 desktop/mobile screenshots inspected separately. The independent reviewer found
 no substantive scoring, state isolation, request-boundary, or completed-flow
 issue; a test-only ambiguous paragraph locator was narrowed to its intended text.
+
+## 2026-10-13 — F1 source, evidence and analytical boundaries
+
+The user authorizes F1 after baseline 1c4b08177fc72306209d04ad0b04bb8815815b2a.
+Select Bahrain Race metadata for 2023–2025 before fetching any numeric keys;
+include session_result as a small additional endpoint because its completed-lap
+counts and DNF/DNS flags are needed to assess retirees and lapped finishers.
+The written [data contract](data-contract.md) establishes agent ownership and
+interfaces before ingestion and quality implementations proceed in parallel.
+An independent read-only source review checked these interpretations.
+
+Current official [access/use information](https://openf1.org/) specifies free
+unauthenticated historical access, 3 requests/second AND 30/minute, personal /
+educational / research / non-commercial purposes, and a CC BY-NC-SA footer.
+The FAQ says attribution is appreciated but not required; we retain attribution
+and do not interpret an open-source code license as commercial data rights.
+No live or paid API is needed. One sequential client enforces both rolling limits
+for retries as well as initial requests; raw response evidence remains local.
+
+The [current endpoint reference](https://openf1.org/docs/) says lap start times
+are approximate. Pit date is only a UTC timestamp, not documented as entrance
+or exit; use a conservative reported-lap-plus-next transition flag and expose
+uncertainty. lane_duration is current, pit_duration is its deprecated alias;
+conflicting values remain visible. Stationary stop_duration starts only at the
+2024 US GP. Missing earlier measurements remain null and affect that analysis
+purpose, not every possible use. No pit duration is renamed incremental pit loss.
+
+Stint ranges are inclusive; historical end laps/results support retrospective
+auditing only. Weather uses a bounded prior sample, never the next sample.
+No measured rainfall plus slick tires identifies a dry candidate, not a proven
+dry track. Scope-aware control intervals must not be cleared by a local green.
+Event timestamps cannot certify publication/decision-time availability. F1
+produces no policy features, fitted tire curves, causal pit-loss estimate, or
+historically calibrated arena. F2 remains a separate task.
+
+## 2026-10-13 — F1 dependency and reproducibility choices
+
+Use a separate src/pitwall_historical package and historical test directory.
+The existing core still has no runtime dependencies and no data imports.
+PyArrow 25.0.0 is pinned with wheel hashes in historical/requirements.lock;
+install it into .venv-historical. Explicit Arrow schemas preserve nullable int,
+float, boolean and UTC timestamp types even for empty/all-null tables. Unknown
+source fields stay in canonical raw JSON; normalized rows are not discarded.
+
+Official APIs checked: [Arrow explicit Table.from_pylist schema](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html#pyarrow.Table.from_pylist),
+[Parquet write_table](https://arrow.apache.org/docs/python/generated/pyarrow.parquet.write_table.html),
+[urllib request timeout](https://docs.python.org/3/library/urllib.request.html#urllib.request.urlopen),
+and [HTTP Retry-After](https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after).
+Audit thresholds live in historical/config.json and are engineering screening
+assumptions, not fitted circuit/tire parameters. Each refresh is a new snapshot;
+build provenance hashes both source and implementation. CI uses small artificial
+source-shaped fixtures and does not download historical races.

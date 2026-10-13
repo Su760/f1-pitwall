@@ -1,5 +1,142 @@
 # PitWall Arena status
 
+## F1 — importer implemented; historical quality gate blocked
+
+Verified 2026-10-13 against reviewed baseline
+`1c4b08177fc72306209d04ad0b04bb8815815b2a`. The separate historical package adds
+bounded OpenF1 access, immutable raw snapshots, typed row-preserving Parquet,
+provenance manifests and deterministic JSON/Markdown suitability reports. The
+approved spec, engine, challenge fixtures, API and web implementation are unchanged.
+Existing local `web/next-env.d.ts` edits and the downloaded spec are preserved.
+
+### Actual source evidence
+
+Metadata resolved all three candidates to circuit **63 / Sakhir**, country Bahrain,
+session Race. Dates and keys below are returned source values, not invented IDs.
+
+| Year / race date (UTC) | Session / meeting | Drivers | Source lap rows / positive timed | Stints | Pit rows | Control / weather | Result rows |
+| --- | --- | ---: | ---: | ---: | --- | ---: | ---: |
+| 2023-03-05 | 7953 / 1141 | 20 | 1058 / 1055 | 70 | unavailable: HTTP 404 | 75 / 161 | 20 |
+| 2024-03-02 | 9472 / 1229 | 20 | 1129 / 1129 | 63 | 43 | 71 / 157 | 20 |
+| 2025-04-13 | 10014 / 1257 | 20 | 1129 / 1128 | 62 | 42 | 93 / 158 | 20 |
+
+Both real bounded imports made 27 requests. The sole failed endpoint is
+`https://api.openf1.org/v1/pit?session_key=7953`, returning **HTTP 404** with
+`{"detail":"No results found."}`. It remains a failed request and the entire
+candidate snapshot is **partial**. The successful 2024/2025 session downloads
+are individually complete, but the conservative shared readiness gate retains
+the candidate-set partial-source blocker. No replacement observations were made.
+
+Expected coverage uses each driver's result, not the winner's 57 laps. Coverage
+is supported for **20/20**, **20/20**, **19/20** drivers respectively. The three
+2023 retirees and the 2025 retiree have an extra started, untimed lap; these are
+identified separately rather than counted as missing completed race laps.
+No expected completed lap numbers are missing for drivers with usable results.
+The 2025 disqualified driver 27 has 57 observed timed laps but a null result
+`number_of_laps`; its trailing completeness remains **unknown**.
+
+There are no duplicate/conflicting logical keys or unmatched session/meeting/driver
+joins in this snapshot. Four untimed retirement-tail rows have no completed-stint
+join. All 3,316 lap rows remain in Parquet and the per-lap audit; all other source
+rows are retained too. Fifty 2023 non-opening stint starts lack corroborating pit
+records. The 85 available pit records preserve current/alias values without
+conflicts; their timestamps fall outside the reported lap interval. Since source
+pit timestamp semantics are unspecified, this remains an uncertainty flag and
+is not a blanket exclusion from lane/stationary duration description.
+
+### Readiness by purpose
+
+Counts below are eligible rows after documented exclusions, not a calibration
+sample recommendation. Every non-blocked purpose is still **limited** by the
+partial candidate-set source audit and any local blockers in `quality.json`.
+
+| Purpose | 2023 | 2024 | 2025 |
+| --- | --- | --- | --- |
+| Descriptive lap/stint rows | limited: 955 / 1058 | limited: 1129 / 1129 | limited: 1128 / 1129 |
+| Dry-pace investigation candidates | limited: 258 / 1058 | blocked: 0 / 1129 | limited: 404 / 1129 |
+| Pit-lane duration description | blocked: source unavailable | limited: 43 / 43 | limited: 42 / 42 |
+| Stationary-stop description | blocked: source unavailable | blocked: 0 / 43 | limited: 40 / 42 |
+| Incremental race-time pit loss | blocked: no counterfactual measurement | blocked | blocked |
+| Decision-time features | blocked: publication times/delays unverified | blocked | blocked |
+
+Dry-pace exclusions affect **800**, **1129**, and **725** distinct source rows;
+per-reason counts overlap and are preserved with source references. No wet-condition
+evidence was observed under these fields, which does not certify a dry session.
+2024's zero eligible dry candidates reflects the conservative control baseline:
+source `GREEN LIGHT - PIT EXIT OPEN` and session-start messages alone do not
+establish global track-clear status. Local yellow/clear events and SC/VSC intervals
+are scoped; missing/ambiguous context remains unknown, not wet. The report exposes
+this policy uncertainty rather than treating absent neutralization evidence as
+proof. Event dates are not established publication times. No future lap or
+completed stint outcome is backfilled into a decision-time feature.
+
+Missing stationary time is expected before the 2024 US GP, and two 2025 stops
+also have no stationary measurement. Missing values remain null. Lane duration,
+stationary duration and synthetic incremental pit loss remain separate concepts.
+F1 has not passed the approved specification's circuit completeness exit gate;
+real-data readiness for unsupported purposes is unverified. No model was fitted
+and the playable arena remains explicitly synthetic.
+
+### Reproduction and provenance
+
+First snapshot: `historical-data/raw/20261013T173313.808650Z-78aa081d6315`.
+Refresh: `historical-data/raw/20261013T173926.193125Z-f1d80d3ff360`.
+Refresh created a distinct manifest and preserved the first evidence; all 27
+response hashes were equal between these downloads. Latest raw-manifest SHA-256:
+`22b92984adf14a904d3b3bfd924530dbcb903190a77f101c3280bd4ce6ffdc21`.
+
+Final reports are local at `historical-data/f1-final-a/quality.md` and
+`quality.json`; comparison build is `historical-data/f1-final-b/`. All **12 files**
+(nine Parquet tables, JSON, Markdown, build manifest) are byte-identical between
+offline builds using Python 3.11.14 / PyArrow 25.0.0. JSON report SHA-256:
+`1b148ae5006e01adc79f85bb9f47e43b79b370c4ef6af7bb6e06b413f79e5792`.
+Markdown SHA-256:
+`631a155c21cec9b0afd5bb5f9160feb2298455e71f4747123bb53403d71b5346`.
+
+After the [README locked setup](../README.md#historical-ingestion-and-offline-quality-audit-f1),
+reproduce from this local cache into fresh directories:
+
+```sh
+SNAPSHOT=historical-data/raw/20261013T173926.193125Z-f1d80d3ff360
+.venv-historical/bin/python -m pitwall_historical rebuild "$SNAPSHOT" --output historical-data/reproduce-a --config historical/config.json
+.venv-historical/bin/python -m pitwall_historical rebuild "$SNAPSHOT" --output historical-data/reproduce-b --config historical/config.json
+diff -r historical-data/reproduce-a historical-data/reproduce-b
+```
+
+Both rebuild commands intentionally return **exit 2 / partial** while writing
+the auditable outputs. Do not chain them with `&&` expecting success. A corrupt
+cache fails closed; existing build directories are never overwritten. Raw data
+and reports are ignored, not in Git; another checkout must import a new snapshot
+and may observe a different upstream revision. The first snapshot predates the
+added `max_lap_number` audit bound; rebuilding it requires the explicit current
+`--config` override, recorded in build provenance. Source config is not rewritten.
+
+### Verification and review
+
+- Historical offline fixtures: **100 passed**, including rate/retry/timeouts,
+  malformed/partial input, hash corruption, joins, alias conflicts, retirements,
+  missing fields, time alignment, bounded pathological values, and reproduction.
+- Combined core + historical: **303 passed** both editable and from the final
+  installed wheel in a separate Python 3.11.14 environment. Historical fixture
+  namespaces prevent collisions with the core suite's existing `conftest` imports.
+- Preserved core/API: **250 passed** in `.venv-api` (Python 3.14.2).
+- Ruff lint/format: passed; wheel packaging and installed historical CLI help passed.
+- Frontend lint/typecheck/production build passed. The default browser invocation
+  initially stopped: `Error: http://127.0.0.1:8000/health is already used`.
+  A temporary ignored config reused the unchanged running API and launched the
+  production web build on 3001: **18 desktop/mobile cases passed**. Tracked browser
+  configuration remains unchanged; CI uses its normal clean 3000/8000 setup.
+- Synthetic CLI comparison, optimization and replay preserved 1113.850 / 1124.700 s,
+  529 candidates / 462 legal, winner 1113.550 s.
+- Independent read-only review verified joins, exclusions, provenance, report
+  claims and actual source hashes. Concrete findings were fixed with regressions:
+  missing control/metadata, boundary propagation, scoped control parsing, uncertain
+  pit timestamps, extreme-value bounds, and failed metadata request summaries.
+  Scoped final review approved; 99 historical tests passed independently before
+  the final narrow classifier review (35 quality tests rerun for that check).
+- Hosted publication/CI are recorded separately below after pushing the checkpoint;
+  local verification and source availability do not imply a hosted CI result.
+
 ## F0.5 — playable arena implemented and locally verified
 
 The milestone adds a local FastAPI + Next.js/TypeScript practice arena with three
@@ -181,10 +318,9 @@ independent review; no substantive correctness finding remains from this pass.
   this repository; no hook was changed or bypassed. Its proposed fix and evidence
   remain in [decisions](decisions.md#2026-10-02--global-stop-hook-diagnosis-unresolved-outside-project).
 
-## Next separate task after F0.5: F1 (not started)
+## Next separately authorized milestone: F2
 
-Build a historical importer and completeness/quality report for one proposed
-circuit. Select sessions from source metadata and expose unsupported fields;
-separate observed quantities from assumed simulator parameters before calibration.
-Do not add RL, accounts, live telemetry, or deployment to that bounded task.
-This pass stops at the local playable F0.5 milestone.
+F1 tooling and observed suitability findings are recorded above. The current
+candidate-set quality gate is blocked; resolve or explicitly narrow unsupported
+analyses before using historical rows for F2 calibration/adaptive strategy.
+No calibration, RL, live telemetry, accounts or deployment was implemented.

@@ -8,7 +8,8 @@ breakdown, then rewind and compare an independent alternative.
 The headless F0 engine still compares and exhaustively optimizes fixed schedules,
 verifies saved traces, and restores/forks snapshots. Its runtime remains Python's
 standard library only. FastAPI and Next.js/TypeScript dependencies are isolated
-under `apps/api` and `web`.
+under `apps/api` and `web`. F1 adds an isolated OpenF1 historical importer
+and suitability audit under `pitwall_historical`; it does not calibrate the arena.
 
 All parameters in `scenarios/synthetic.json` are **synthetic assumptions**, not
 historical F1 measurements or calibrated predictions.
@@ -290,7 +291,68 @@ The complete approved [project spec](docs/project-spec.md) is version 2.1. See
 [decisions](docs/decisions.md) for rationale and tooling findings, and
 [status](docs/status.md) for verification evidence and remaining work.
 
-F0a, F0b, and the F0.5 local playable loop are implemented. The next bounded task
-is **F1**: a historical importer and completeness/quality report for one proposed
-circuit, before calibration or changing the synthetic model. Historical data,
-databases, uncertainty modeling, and learning frameworks are not included here.
+F0a, F0b, F0.5 and the F1 importer/audit tooling are implemented. The historical
+quality gate remains evidence-dependent; see the current [F1 findings](docs/status.md).
+Calibration and adaptive strategy belong to a separately authorized F2 task.
+RL, live data, accounts and deployment remain deferred.
+
+## Historical ingestion and offline quality audit (F1)
+
+The bounded candidate set is Bahrain Race sessions in 2023–2025. Numeric keys
+come from returned OpenF1 metadata. The importer requests sessions, meetings,
+drivers, laps, stints, pit records, race control, weather and session results.
+A complete download only establishes request completion; the quality report
+separately assesses each analysis purpose. No simulator parameters are fitted.
+
+Install the isolated dependency lock (Python 3.11 is verified):
+
+```sh
+python3.11 -m venv .venv-historical
+.venv-historical/bin/python -m pip install --require-hashes -r requirements-dev.lock -r historical/requirements.lock
+.venv-historical/bin/python -m pip install --no-build-isolation --no-deps -e .
+.venv-historical/bin/python -m pytest -q historical/tests
+```
+
+Download a new snapshot; run only one importer at a time per shared source/IP
+budget. Its configuration enforces both 3 requests/second and 30/minute, timeout,
+response-size and retry bounds. Every run creates a new directory, including
+failed/partial runs, and prints its path and status:
+
+```sh
+.venv-historical/bin/python -m pitwall_historical import --cache historical-data/raw --config historical/config.json
+```
+
+Set `SNAPSHOT` to the exact path printed by that command. Rebuild without source
+access into two unused output paths (exit 2 is intentional for partial imports;
+it still writes diagnostic reports, while corrupt cache evidence is rejected):
+
+```sh
+SNAPSHOT=historical-data/raw/REPLACE_WITH_PRINTED_SNAPSHOT_ID
+.venv-historical/bin/python -m pitwall_historical rebuild "$SNAPSHOT" --output historical-data/build-a --config historical/config.json
+.venv-historical/bin/python -m pitwall_historical rebuild "$SNAPSHOT" --output historical-data/build-b --config historical/config.json
+diff -r historical-data/build-a historical-data/build-b
+```
+
+Read `quality.md` for session/driver coverage, exclusions and purpose-specific
+readiness; `quality.json` also contains row references, every lap/stint/pit audit,
+missing-field and join counts. `build-manifest.json` records raw-manifest hash,
+audit config, code hashes, Python/PyArrow versions, Parquet hashes and logical
+row hashes. All nine tables use explicit nullable types and retain original rows,
+duplicates and raw JSON. Rebuilding twice with the same cache/config/toolchain
+reproduces file content. A refresh preserves prior evidence under a new identity;
+future source revisions need not reproduce an earlier snapshot.
+
+The actual first audit resolved sessions 7953 (2023), 9472 (2024), and 10014 (2025),
+all circuit 63/Sakhir. The 2023 pit endpoint returned HTTP 404, “No results found.”
+This is recorded as partial source availability, not an empty complete pit dataset.
+The 2025 disqualified driver's completed-lap count is unavailable. Missing values
+stay unknown; no-rain samples do not certify a dry track. Pit lane and stationary
+durations are not incremental race-time pit loss; publication times remain
+unverified, so decision-time feature reconstruction is blocked.
+
+Raw caches and generated tables/reports live in ignored `historical-data/` and
+are not distributed in Git. Small tests use artificial source-shaped fixtures and
+forbid network access. The separate CI historical job never downloads a race;
+existing core/API/browser jobs remain in place. See [data contract](docs/data-contract.md),
+[dated sources/decisions](docs/decisions.md), and [status](docs/status.md) for the
+exact source evidence, limitations and reproduction of the local audit.

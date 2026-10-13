@@ -1,0 +1,2 @@
+# Isolated F1 Parquet writer; the core remains dependency-free.
+pyarrow==25.0.0

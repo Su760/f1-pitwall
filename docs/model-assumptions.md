@@ -298,3 +298,30 @@ Staying out costs `(10 + 2) + (10 + 4) = 26 s`. A fresh hard set has -1 s pace,
 `(10 - 1 + 2 + 3) + (10 - 1) = 23 s`. Thus staying out scores 3 s excess.
 This arithmetic is independent of the evaluator; fresh soft and medium yield
 25 s and 26 s respectively, so hard is the best of all four legal calls.
+
+## F1 audit assumptions (separate from the synthetic model)
+
+Historical ingestion adds no values to the engine, challenge fixtures, policies,
+or arena. The [data contract](data-contract.md) separates source observations from
+retrospective derivations and purpose-specific eligibility. There is no calibration.
+
+`historical/config.json` versions the audit choices: 120 s maximum prior-weather
+age, 2 s tolerance on approximate lap alignment, 0.05 s sector-sum tolerance,
+30–300 s broad timing-screen bounds, and a 1,000-lap maximum for diagnostic
+range enumeration. These are explicit screening assumptions,
+not fitted Bahrain pace or tire parameters. Flagged rows remain in raw/normalized
+outputs and exclusions retain source-row references and overlapping reason counts.
+
+A unique inclusive stint join permits derived start-of-lap tire age from the
+observed starting age plus lap offset; missing starting age remains unknown.
+Stint completion and final results are retrospective evidence, not decision-time
+features. Weather zero rainfall with slick tires is only a dry candidate, never
+proof of a dry track. Control parsing is conservative and reports uncertainty.
+Historical event times are not known publication times; no availability delay
+is assumed or decision-time feature table emitted in F1.
+
+Pit lane duration and stationary duration are separate observed quantities.
+The deprecated alias is preserved and conflicting values are flagged. Missing
+stationary duration, including earlier-than-2024-US-GP data, remains null. Neither
+measurement identifies the incremental counterfactual cost of pitting; that
+analysis is blocked. The simulator's 18 s pit loss remains a synthetic assumption.

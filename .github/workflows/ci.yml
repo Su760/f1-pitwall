@@ -37,6 +37,24 @@ jobs:
           pitwall replay traces/restored.json --scenario scenarios/synthetic.json
           pitwall replay traces/forked.json --scenario scenarios/synthetic.json
 
+  historical:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements-dev.lock
+            historical/requirements.lock
+      - name: Install isolated historical tooling
+        run: |
+          python -m pip install --require-hashes -r requirements-dev.lock -r historical/requirements.lock
+          python -m pip install --no-build-isolation --no-deps -e .
+      - name: Audit small source-shaped fixtures without source access
+        run: python -m pytest -q historical/tests
+
   arena:
     runs-on: ubuntu-latest
     steps:

@@ -15,6 +15,7 @@ dev = ["pytest", "ruff", "setuptools==82.0.1"]
 
 [project.scripts]
 pitwall = "pitwall.cli:main"
+pitwall-historical = "pitwall_historical.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -146,3 +146,61 @@ passed both core Python jobs and the API/production-browser arena job, including
 all 18 browser cases. This documentation-only follow-up records the observed
 result; its final commit and CI are reported in the handoff. Generated artifacts
 and the original spec download remain outside Git. F0.5 stops here; F1 is separate.
+
+# F1 — historical ingestion and one-circuit quality audit
+
+Authorized 2026-10-13: implementation, verification, documentation, commit/push;
+record plan then execute without a planning approval stop. Reviewed baseline
+1c4b08177fc72306209d04ad0b04bb8815815b2a. Preserve existing web/next-env.d.ts
+modification and untracked original spec. Approved docs/project-spec.md unchanged.
+
+Goal: auditable, reproducible OpenF1 Bahrain 2023–2025 Race ingestion and honest
+purpose-specific suitability evidence. No F2 fitting or changes to the arena.
+Architecture: separate pitwall_historical package; stdlib HTTP/cache/quality,
+explicit nullable Arrow schemas and separate hash-locked PyArrow dependency.
+Contract: docs/data-contract.md; no invented session IDs or dry/completeness claims.
+
+Files and ownership:
+
+- Root: docs/data-contract.md; historical/config.json, requirements.in/lock;
+  src/pitwall_historical/{**init**,**main**,schema,normalize}.py;
+  historical/tests/test_normalize.py, test_historical_cli.py and conftest.py;
+  historical/**init**.py and historical/tests/**init**.py (fixture namespace);
+  pyproject.toml, .gitignore,
+  .github/workflows/ci.yml; README, AGENTS, assumptions, decisions, status, todo.
+- Ingestion agent: src/pitwall_historical/{client,cache}.py;
+  historical/tests/test_client.py and test_cache.py.
+- Quality agent: src/pitwall_historical/quality.py (and quality helpers if needed);
+  historical/tests/test_quality.py, synthetic fixture helpers local to that suite.
+- Independent reviewer: read-only contract/joins/exclusions/provenance/report claims.
+- Generated evidence: ignored historical-data/ and .venv-historical/ only.
+
+Review focus: null versus absent; duplicate versus conflicting natural keys;
+retirees/DNS/lapped cars and unknown tails; stale/future weather and unresolved
+control intervals; partial downloads/corrupt or mismatched cache provenance.
+Each owner adds focused offline regression fixtures for these boundaries.
+
+- [x] Establish dated source contract, schemas/config and team interfaces.
+- [x] Implement bounded client and immutable complete/partial cache; offline tests.
+- [x] Implement row-preserving quality flags, joins, coverage, exclusions/readiness.
+- [x] Integrate typed Parquet/offline CLI, provenance, locked dependencies and CI.
+- [x] Run actual bounded source import; rebuild twice offline and compare hashes.
+- [x] Independently review and resolve substantive findings with regression tests.
+- [x] Verify preserved core/API/arena and relevant packaging/lint checks.
+- [x] Record identities, coverage, readiness/blockers and exact reproduction commands.
+- [ ] Inspect diff/staging, commit/push scoped changes and verify pushed-commit CI.
+
+
+F1 local evidence: 100 offline historical tests, 203 preserved core tests (303
+combined and from final installed wheel), 250 core/API tests, 18 production-browser
+cases, Ruff and packaging pass. Initial combined-suite fixture import collision
+was fixed by namespacing historical tests; default browser launch hit existing
+services and passed using a temporary 3001 configuration without stopping them.
+Independent review findings were regression-tested and final scoped review approved.
+
+Actual OpenF1 snapshot is partial: 2023 session 7953 pit returns HTTP404; sessions
+9472/10014 otherwise downloaded completely. Circuit 63/Sakhir candidate gate is
+blocked; 2025 driver 27 completed-lap result is null. Two real snapshots retain
+identical hashes for all 27 responses. Final two offline builds preserve all 3,316
+lap rows and are byte-identical across 12 files. Exact identities, counts, caveats,
+hashes and reproduction commands are in docs/status.md. No F2 work performed.

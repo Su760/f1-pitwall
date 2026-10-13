@@ -94,3 +94,21 @@ report local checks, independent review, remote CI, and tooling issues separatel
 Commit/push only when requested. Inspect staged files for credentials, `.env`,
 databases, caches, environments, datasets, and generated traces. Use
 `<type>: <description>` commits; never force-push or reset unrelated work.
+
+## F1 historical audit
+
+Read [the data contract](docs/data-contract.md) before historical changes. The
+isolated `pitwall_historical` package never feeds the engine/API observations.
+Install `requirements-dev.lock` and `historical/requirements.lock` with hashes
+into `.venv-historical`; run `.venv-historical/bin/python -m pytest -q historical/tests`.
+Tests forbid network access and use artificial source-shaped fixtures. Core tests
+remain dependency-free. Keep `historical-data/`, raw responses, Parquet, generated
+reports and environments outside Git. Commit only source/config/small test fixtures.
+
+Only `import` accesses OpenF1. Run one importer at a time per shared source/IP rate
+budget; it enforces both free-tier limits and preserves failed/partial evidence.
+`rebuild` is offline and refuses existing output directories. Never manually
+repair a raw snapshot; refresh into a new one. A complete download is not a passed
+quality gate. Keep purpose-specific blockers, missing stationary times, retirement
+coverage and wet/neutralization uncertainty visible. No historical field may be
+renamed incremental pit loss. F2 calibration requires separate authorization.
