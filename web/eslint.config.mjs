@@ -11,5 +11,7 @@ export default defineConfig([
     "next-env.d.ts",
     "playwright-report/**",
     "test-results/**",
+    // Local generated screenshots and temporary F1 browser-run configurations.
+    "artifacts/**",
   ]),
 ]);

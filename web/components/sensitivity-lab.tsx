@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { request } from "@/lib/api";
 import type {
   Control,
@@ -46,6 +46,9 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
       controlNames.map((k) => [k, String(metadata.controls[k].default)]),
     ) as Record<Control, string>;
   const [inputs, setInputs] = useState(defaults);
+  const [activeCell, setActiveCell] = useState(0);
+  const cells = useRef<(HTMLButtonElement | null)[]>([]);
+  const resetButton = useRef<HTMLButtonElement>(null);
   const [retry, setRetry] = useState(0);
   const [answer, setAnswer] = useState<{
     key: string;
@@ -106,16 +109,52 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
       controller.abort();
     };
   }, [currentKey, retry]);
+  function navigateMap(
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+    size: number,
+  ) {
+    let row = Math.floor(index / size),
+      column = index % size;
+    switch (event.key) {
+      case "ArrowLeft":
+        column = Math.max(0, column - 1);
+        break;
+      case "ArrowRight":
+        column = Math.min(size - 1, column + 1);
+        break;
+      case "ArrowUp":
+        row = Math.max(0, row - 1);
+        break;
+      case "ArrowDown":
+        row = Math.min(size - 1, row + 1);
+        break;
+      case "Home":
+        column = 0;
+        if (event.ctrlKey) row = 0;
+        break;
+      case "End":
+        column = size - 1;
+        if (event.ctrlKey) row = size - 1;
+        break;
+      default:
+        return; // Native Tab / Shift+Tab leave the composite grid.
+    }
+    event.preventDefault();
+    cells.current[row * size + column]?.focus();
+  }
   function update(key: Control, value: string) {
     setInputs((old) => ({ ...old, [key]: value }));
     setAnswer(null);
     setSelected(null);
+    setActiveCell(0);
     setRetry((n) => n + 1); // Re-request even if text changes from 18 to 18.0.
   }
   function reset() {
     setInputs(defaults());
     setAnswer(null);
     setSelected(null);
+    setActiveCell(0);
     setRetry((n) => n + 1);
   }
   return (
@@ -152,7 +191,7 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
             </div>
           );
         })}
-        <button className="lab-button" onClick={reset}>
+        <button className="lab-button" ref={resetButton} onClick={reset}>
           Reset assumptions
         </button>
       </section>
@@ -172,6 +211,9 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
           <button
             className="lab-button"
             onClick={() => {
+              // The retry button unmounts while loading; retain a useful focus target.
+              resetButton.current?.focus();
+              setActiveCell(0);
               setAnswer(null);
               setRetry((n) => n + 1);
             }}
@@ -277,12 +319,20 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
               numerical tie. Select or focus a cell for its exact sampled
               comparison.
             </p>
-            <div
-              className="lab-map-scroll"
-              tabIndex={0}
-              aria-label="Sensitivity map, scroll horizontally on small screens"
-            >
-              <table className="lab-map">
+            <p id="map-keyboard-help" className="lab-note">
+              Tab enters at one cell. Arrow keys move between samples; Home/End
+              move to the row edges; Ctrl+Home/End move to the grid corners. Tab
+              or Shift+Tab leaves the map. Scroll or swipe to explore; both axes
+              stay visible. Changing assumptions resets the map entry to the
+              top-left sample.
+            </p>
+            <div className="lab-map-scroll">
+              <table
+                className="lab-map"
+                role="grid"
+                aria-labelledby="map-title"
+                aria-describedby="map-keyboard-help"
+              >
                 <caption>
                   Pit-loss × degradation sensitivity; each cell compares only
                   these two schedules
@@ -298,22 +348,52 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...result.grid.rows].reverse().map((row) => (
+                  {[...result.grid.rows].reverse().map((row, rowIndex) => (
                     <tr key={row[0].degradation_multiplier}>
                       <th scope="row">
                         {Number(row[0].degradation_multiplier.toFixed(2))}
                       </th>
-                      {row.map((point) => (
-                        <td key={point.pit_loss_s}>
+                      {row.map((point, columnIndex) => (
+                        <td role="gridcell" key={point.pit_loss_s}>
                           <button
                             className={"lab-cell lab-winner-" + point.winner}
                             aria-label={pointLabel(point)}
-                            onFocus={() =>
-                              setSelected({ key: currentKey!, point })
+                            tabIndex={
+                              activeCell ===
+                              rowIndex * result.grid.size + columnIndex
+                                ? 0
+                                : -1
                             }
-                            onClick={() =>
-                              setSelected({ key: currentKey!, point })
+                            ref={(element) => {
+                              cells.current[
+                                rowIndex * result.grid.size + columnIndex
+                              ] = element;
+                            }}
+                            onKeyDown={(event) =>
+                              navigateMap(
+                                event,
+                                rowIndex * result.grid.size + columnIndex,
+                                result.grid.size,
+                              )
                             }
+                            onFocus={(event) => {
+                              setActiveCell(
+                                rowIndex * result.grid.size + columnIndex,
+                              );
+                              setSelected({ key: currentKey!, point });
+                              event.currentTarget.scrollIntoView({
+                                block: "nearest",
+                                inline: "nearest",
+                                behavior: "instant",
+                              });
+                            }}
+                            onClick={(event) => {
+                              event.currentTarget.focus();
+                              setActiveCell(
+                                rowIndex * result.grid.size + columnIndex,
+                              );
+                              setSelected({ key: currentKey!, point });
+                            }}
                           >
                             {point.symbol}
                           </button>
@@ -382,6 +462,7 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
   );
 }
 export default function SensitivityLab() {
+  const heading = useRef<HTMLHeadingElement>(null);
   const [metadata, setMetadata] = useState<LabMetadata | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [retry, setRetry] = useState(0);
@@ -407,7 +488,9 @@ export default function SensitivityLab() {
         <span>Synthetic lab · S1</span>
       </header>
       <div className="lab-intro">
-        <h1>What changes the call?</h1>
+        <h1 ref={heading} tabIndex={-1}>
+          What changes the call?
+        </h1>
         <p>
           Compare the fixed one-stop and two-stop schedules across illustrative
           pit-loss, tire degradation and warm-up assumptions.
@@ -422,6 +505,7 @@ export default function SensitivityLab() {
           <button
             className="lab-button"
             onClick={() => {
+              heading.current?.focus();
               setError(null);
               setRetry((n) => n + 1);
             }}

@@ -9,3 +9,8 @@
   verified replay, snapshot restoration, and independent forks. The earlier
   proposed schedule-only follow-up was incomplete; use the supplied spec and
   distinguish the full next milestone from the current F0a boundary.
+
+- 2026-10-17: S1.1 correction: hundreds of individually accessible buttons do not
+  make an efficient keyboard interface. Use a WAI composite grid with one Tab
+  stop and verify navigation, exit and refresh focus. Verify normal lint with
+  retained generated artifacts, rather than relying on a one-off ignore flag.

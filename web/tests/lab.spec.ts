@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 import fs from "node:fs/promises";
+import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const pit = "Incremental pit loss (s/stop)";
 test("lab discovery, reversal, tie, scaling controls, reset and exports", async ({
@@ -56,6 +58,38 @@ test("lab discovery, reversal, tie, scaling controls, reset and exports", async 
       expect(parsed.comparison.strategies[0].total_elapsed_s).toBe(1113.85);
     }
   }
+  const root = path.resolve(__dirname, "../..");
+  const python =
+    process.env.PITWALL_PYTHON ?? path.join(root, ".venv-api/bin/python");
+  for (const [flag, input, output] of [
+    ["--scenario", "lab-scenario.json", "comparison.json"],
+    ["--record", "lab-result.json", "verified.json"],
+    ["--record", "lab-result.json", "verified-again.json"],
+  ])
+    execFileSync(
+      python,
+      [
+        "-m",
+        "pitwall.sensitivity",
+        flag,
+        info.outputPath(input),
+        "--output",
+        info.outputPath(output),
+      ],
+      { cwd: root },
+    );
+  const record = JSON.parse(
+    await fs.readFile(info.outputPath("lab-result.json"), "utf8"),
+  );
+  expect(
+    JSON.parse(await fs.readFile(info.outputPath("comparison.json"), "utf8")),
+  ).toEqual(record.comparison);
+  expect(
+    JSON.parse(await fs.readFile(info.outputPath("verified.json"), "utf8")),
+  ).toEqual(record);
+  expect(await fs.readFile(info.outputPath("verified.json"), "utf8")).toEqual(
+    await fs.readFile(info.outputPath("verified-again.json"), "utf8"),
+  );
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -114,7 +148,11 @@ test("errors retry and invalid input hides prior results", async ({ page }) => {
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
     "Temporary lab failure",
   );
-  await page.getByRole("button", { name: "Retry comparison" }).click();
+  await page.getByRole("button", { name: "Retry comparison" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("button", { name: "Reset assumptions" }),
+  ).toBeFocused();
   await expect(page.getByTestId("one-stop-total")).toHaveText("1113.850 s");
   await page.getByLabel(pit, { exact: true }).fill("41");
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
@@ -123,4 +161,132 @@ test("errors retry and invalid input hides prior results", async ({ page }) => {
   await expect(page.getByTestId("lab-results")).toHaveCount(0);
   await page.getByRole("button", { name: "Reset assumptions" }).click();
   await expect(page.getByTestId("one-stop-total")).toHaveText("1113.850 s");
+});
+
+test("map keyboard navigation has one entry and predictable exit and refresh", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await page.goto("/lab");
+  const grid = page.getByRole("grid", { name: "Where the preference changes" });
+  await expect(grid).toBeVisible();
+  const cells = grid.getByRole("button");
+  const reset = page.getByRole("button", { name: "Reset assumptions" });
+  const exportScenario = page.getByRole("button", {
+    name: "Export scenario",
+    exact: true,
+  });
+  await expect(cells).toHaveCount(441);
+  await expect(grid.locator('button[tabindex="0"]')).toHaveCount(1);
+  await reset.focus();
+  await page.keyboard.press("Tab");
+  await expect(cells.first()).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowUp");
+  await expect(cells.first()).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(cells.nth(1)).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(cells.nth(22)).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(cells.nth(21)).toBeFocused();
+  await page.keyboard.press("End");
+  await expect(cells.nth(41)).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(cells.nth(41)).toBeFocused();
+  await page.keyboard.press("Control+End");
+  await expect(cells.last()).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(cells.last()).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(exportScenario).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(cells.last()).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(reset).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(cells.last()).toBeFocused();
+  await page.keyboard.press("Control+Home");
+  await expect(cells.first()).toBeFocused();
+  // Every sample is reachable through directional navigation, not just DOM focus.
+  await page.evaluate(() => {
+    document.querySelectorAll(".lab-cell").forEach((el) => {
+      el.addEventListener("focus", () =>
+        el.setAttribute("data-visited", "yes"),
+      );
+    });
+  });
+  await cells.last().click();
+  await expect(grid.locator('button[tabindex="0"]')).toHaveCount(1);
+  await page.keyboard.press("Control+Home");
+  for (let row = 0; row < 21; row++) {
+    for (let col = 1; col < 21; col++) await page.keyboard.press("ArrowRight");
+    if (row < 20) {
+      await page.keyboard.press("ArrowDown");
+      await page.keyboard.press("Home");
+    }
+  }
+  await expect(grid.locator('[data-visited="yes"]')).toHaveCount(441);
+  const view = await cells.last().evaluate((el) => {
+    const cell = el.getBoundingClientRect(),
+      header = el.closest("tr")!.querySelector("th")!.getBoundingClientRect();
+    const container = el.closest(".lab-map-scroll")!.getBoundingClientRect();
+    const columnHeader = el
+      .closest("table")!
+      .querySelector("thead th:last-child")!
+      .getBoundingClientRect();
+    return {
+      width: cell.width,
+      height: cell.height,
+      visible: cell.left >= header.right && cell.right <= container.right + 1,
+      headerVisible:
+        header.left >= container.left && header.right <= container.right,
+      columnVisible:
+        columnHeader.top >= container.top && columnHeader.bottom <= cell.top,
+      cellWithinViewport: cell.bottom <= container.bottom + 1,
+      outline: getComputedStyle(el).outlineStyle,
+    };
+  });
+  expect(view.width).toBeGreaterThanOrEqual(44);
+  expect(view.height).toBeGreaterThanOrEqual(44);
+  expect(view.visible).toBeTruthy();
+  expect(view.headerVisible).toBeTruthy();
+  expect(view.columnVisible).toBeTruthy();
+  expect(view.cellWithinViewport).toBeTruthy();
+  expect(view.outline).toBe("solid");
+  await page.getByLabel(pit, { exact: true }).fill("0");
+  await expect(page.getByTestId("one-stop-total")).toHaveText("1095.850 s");
+  await expect(page.getByLabel(pit, { exact: true })).toBeFocused();
+  await expect(grid.locator('button[tabindex="0"]')).toHaveCount(1);
+  await expect(cells.first()).toHaveAttribute("tabindex", "0");
+  await reset.click();
+  await expect(page.getByTestId("one-stop-total")).toHaveText("1113.850 s");
+  await expect(reset).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(cells.first()).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(exportScenario).toBeFocused();
+});
+
+test("setup retry keeps keyboard focus on a persistent target", async ({
+  page,
+}) => {
+  let fail = true;
+  await page.route("**/api/v1/lab", async (route) => {
+    if (fail && route.request().method() === "GET") {
+      fail = false;
+      await route.fulfill({
+        status: 503,
+        json: { detail: { message: "Temporary setup failure" } },
+      });
+    } else await route.continue();
+  });
+  await page.goto("/lab");
+  await page.getByRole("button", { name: "Retry lab setup" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+  await expect(page.getByTestId("one-stop-total")).toHaveText("1113.850 s");
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByLabel(pit, { exact: true })).toBeFocused();
 });

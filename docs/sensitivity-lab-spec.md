@@ -45,3 +45,12 @@ Acceptance: default multipliers and pit18 =>1113.850/1124.700; pit7.15 =>
 legality, component sums, pit marginal cost, exports/recomputation, bounds and
 stale responses. Inspect reversal/reset/rapid changes and desktop/mobile; obtain
 independent read-only review. Preserve challenges and historical artifacts.
+
+S1.1 keyboard refinement: the sampled table is a WAI data grid with one roving
+Tab stop. Arrows move without wrapping; Home/End move to row edges and
+Ctrl+Home/End to grid corners. Tab/Shift+Tab leave normally. Pointer inspection
+updates the entry point. Changed/equivalent inputs and reset select top-left for
+next entry while preserving focus on the control. Retry comparison focuses Reset;
+retry setup focuses the heading. Responses do not steal focus. Samples have
+44px minimum targets, visible focus and pinned row/column labels in a bounded
+scrolling viewport.

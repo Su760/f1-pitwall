@@ -1,3 +1,9 @@
+# S1.1 — locally verified; publication pending
+
+See [scoped plan](s1-1-review.md). User authorizes implementation, verification,
+commit/push and hosted CI. Preserve numerical/API/export behavior and historical
+evidence. S2 remains a proposal only.
+
 # S1 — synthetic sensitivity lab delivered
 
 See [scoped task](s1-sensitivity-lab.md) and [spec](../docs/sensitivity-lab-spec.md).

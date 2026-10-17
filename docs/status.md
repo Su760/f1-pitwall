@@ -1,5 +1,24 @@
 # PitWall Arena status
 
+## S1.1 — bounded lab review and accessibility repair
+
+The lab now has one map Tab stop with directional navigation, normal exit and
+predictable refresh/retry focus. Touch targets are at least 44×44px; both axes stay
+visible in a bounded map viewport. Normal local lint includes source/tests while
+narrowly excluding the retained generated `web/artifacts/` directory.
+See [review/tool inventory](reports/s1-1-review.md) and [task](../tasks/s1-1-review.md).
+
+UI/UX Pro Max was available and used. Ponytail, PStack and Thermo Nuclear Code
+Review were not found; independent backend and client reviewers supplied distinct
+fallback reviews. No numerical/API/export compatibility change. Acceptance cases,
+replay and historical/challenge regressions remain intact. 297 core/API tests,
+129 historical tests and 28 browser cases pass; normal lint/typecheck/build and
+rendered 375/768/1024/1440 checks pass. Publication evidence follows in the review.
+
+S1.1 stops here. S2 is only a proposed explicit “Find best legal strategy” action
+using the existing bounded optimizer at selected settings. No S2 implementation,
+calibration, adaptive planning or RL; full historical gate remains blocked.
+
 ## S1 — synthetic strategy sensitivity lab
 
 The discoverable `/lab` compares the existing one-stop and two-stop schedules
