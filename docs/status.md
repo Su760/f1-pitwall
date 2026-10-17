@@ -24,9 +24,11 @@ artifacts byte-for-byte; both return expected exit 2 / partial. The regenerated
 v2 quality hash matches F1.1 exactly. The report records hashes and commands.
 Local checks: 8 focused cohort, 313 combined core/historical (110 historical),
 250 core/API tests; Ruff lint/format and wheel build pass. Independent read-only
-code and final evidence/document reviews found no actionable issue. Pushed
-CI is recorded in the task closure. Browser tests are delegated to the unchanged
-hosted arena job; no local UI implementation was touched. The approved spec and
+code and final evidence/document reviews found no actionable issue. Implementation
+[`65db62d`](https://github.com/Su760/f1-pitwall/commit/65db62d41d9ad24b32e3acb3f5dec78902f9a95a)
+is pushed; [CI 38998554927](https://github.com/Su760/f1-pitwall/actions/runs/38998554927)
+passed all four jobs, including the production-browser arena. No local UI
+implementation was touched. The approved spec and
 unrelated local work remain intact. See [scoped task](../tasks/f1-2-cohort-audit.md).
 One proposed next task: a descriptive report of the frozen members with deletion
 annotations, counts/dispersion and race-lap-aligned plots; no calibration.

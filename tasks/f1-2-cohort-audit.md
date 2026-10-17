@@ -18,7 +18,7 @@ The approved specification, quality v2 implementation and arena remain unchanged
 - [x] Diagnose identifiability algebraically without fitting; distinguish three
       analysis purposes and validation/selection limits; retain the full blocked gate.
 - [x] Reproduce outputs twice; run relevant repository checks and independent review.
-- [ ] Write final report/status/decisions, inspect staged diff, commit/push, verify CI.
+- [x] Write final report/status/decisions, inspect staged diff, commit/push, verify CI.
 
 Selection is exactly session 10014 AND existing `dry_pace_eligible` AND driver !=27.
 382 is a result to verify, never a selector limit or hardcoded success criterion.
@@ -58,4 +58,15 @@ passes. No v2 implementation or source evidence changed. Independent read-only
 code and final docs/evidence reviews found no actionable blocker. Reviewer
 independently verified every reported SHA, both artifact sets, the baseline v2
 report/spec hashes, coverage tables, interval/weather evidence, deletion counts
-and rank proof. Publication/CI remains the final pending step.
+and rank proof. Publication/CI verified below.
+
+Publication: implementation commit
+[`65db62d41d9ad24b32e3acb3f5dec78902f9a95a`](https://github.com/Su760/f1-pitwall/commit/65db62d41d9ad24b32e3acb3f5dec78902f9a95a)
+pushed to origin/main without force. [CI 38998554927](https://github.com/Su760/f1-pitwall/actions/runs/38998554927)
+passed all four jobs: historical, Python 3.11/3.14 core and production-browser
+arena. This documentation-only closure records that verified outcome; its own
+exact commit and CI are supplied in the final handoff. The full data gate remains
+blocked. Approved spec and v2 implementation/config hashes are unchanged;
+unrelated web/next-env.d.ts and downloaded spec remain outside these commits.
+F1.2 is complete. Next proposed task is the report's bounded descriptive summary,
+requiring separate authorization; no F2 calibration or RL was started.

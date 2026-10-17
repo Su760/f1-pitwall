@@ -1,8 +1,13 @@
-# F1.2 — active retrospective cohort audit
+# F1.2 — cohort audit complete; calibration unsupported
 
-See [the scoped F1.2 task](f1-2-cohort-audit.md). Authorized to execute and publish;
-use retained evidence and unchanged v2 eligibility only. Stop after suitability
-assessment; no model fitting, calibration or RL.
+See [the completed F1.2 task](f1-2-cohort-audit.md) and
+[cohort audit](../docs/reports/f1-2-cohort-audit.md). Reproduced 382 members plus
+747 distinct exclusions from unchanged v2; full gate remains blocked. Separate
+age/lap/compound/driver effects are unidentified; calibration is unsupported.
+Commit `65db62d41d9ad24b32e3acb3f5dec78902f9a95a` is pushed and all four jobs in
+[CI 38998554927](https://github.com/Su760/f1-pitwall/actions/runs/38998554927) pass.
+Stop after F1.2. The single proposed next task is a bounded descriptive report
+of these frozen members; no fitting, calibration or RL is authorized.
 
 # F1.1 — quality repair complete; historical gate still blocked
 
