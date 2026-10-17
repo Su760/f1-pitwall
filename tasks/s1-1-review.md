@@ -17,7 +17,7 @@ Root owns implementation; reviewers read only with distinct backend / client foc
 - [x] Validate/consolidate independent numerical/API and client-state reviews;
       fix only reproduced scoped issues. Apply UI UX Pro targeted recommendations.
 - [x] Run focused/full checks, acceptance/export replay, normal lint and UI inspection.
-- [ ] Record actual tool paths/use/findings/evidence; stage scoped files, commit/push,
+- [x] Record actual tool paths/use/findings/evidence; stage scoped files, commit/push,
       verify hosted CI and stop. S2 is proposed, never implemented.
 
 Interaction choice: WAI data-grid semantics on the existing table, roving button
@@ -48,3 +48,9 @@ paths and actual downloaded JSON replay twice. Rendered 375/768/1024/1440 checks
 show no page overflow, persistent axes and focused samples not hidden by headers.
 No backend numerical/API change. UI UX Pro actual commands and missing requested
 tools are recorded in docs/reports/s1-1-review.md. Independent reviewers read only.
+
+Publication: scoped implementation `34126a8468e5b3ed5499d20e2079a65dd527d14c`
+is pushed without force; [CI 39012839475](https://github.com/Su760/f1-pitwall/actions/runs/39012839475)
+passed all four jobs. Final independent review closes the pinned-axis finding.
+This docs-only closure records the result; its exact commit/CI is in the handoff.
+Stop at S1.1; no other feature started. All unrelated local work remains intact.

@@ -13,7 +13,9 @@ Review were not found; independent backend and client reviewers supplied distinc
 fallback reviews. No numerical/API/export compatibility change. Acceptance cases,
 replay and historical/challenge regressions remain intact. 297 core/API tests,
 129 historical tests and 28 browser cases pass; normal lint/typecheck/build and
-rendered 375/768/1024/1440 checks pass. Publication evidence follows in the review.
+rendered 375/768/1024/1440 checks pass. Implementation `34126a8` is pushed;
+[CI 39012839475](https://github.com/Su760/f1-pitwall/actions/runs/39012839475)
+passes all four jobs, including production browser tests.
 
 S1.1 stops here. S2 is only a proposed explicit “Find best legal strategy” action
 using the existing bounded optimizer at selected settings. No S2 implementation,

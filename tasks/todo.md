@@ -1,8 +1,10 @@
-# S1.1 — locally verified; publication pending
+# S1.1 — delivered
 
 See [scoped plan](s1-1-review.md). User authorizes implementation, verification,
 commit/push and hosted CI. Preserve numerical/API/export behavior and historical
-evidence. S2 remains a proposal only.
+evidence. Implementation `34126a8` is pushed; [CI 39012839475](https://github.com/Su760/f1-pitwall/actions/runs/39012839475)
+passes all four jobs. 28 browser, 297 core/API and 129 historical tests pass.
+S2 remains a proposal only.
 
 # S1 — synthetic sensitivity lab delivered
 

@@ -145,7 +145,10 @@ provides the directory-scoped exclusion mechanism.
   independently inspected the root-generated desktop/mobile screenshots.
   Latest visual evidence: `traces/s11-fixed-axes-{375,768,1024,1440}.png`;
   controls: `traces/s11-final-controls-{375,768,1024,1440}.png`.
-- Publication CI is pending for the scoped implementation commit.
+- Implementation [`34126a8`](https://github.com/Su760/f1-pitwall/commit/34126a8468e5b3ed5499d20e2079a65dd527d14c)
+  is pushed. [CI 39012839475](https://github.com/Su760/f1-pitwall/actions/runs/39012839475)
+  passes all four jobs: historical, Python 3.11/3.14, and production arena/browser.
+  The docs-only closure commit/CI is supplied in the final handoff.
 
 Generated screenshots/results/exports remain ignored under `traces/` and
 `web/test-results/`. Preserved artifact config SHA-256:
