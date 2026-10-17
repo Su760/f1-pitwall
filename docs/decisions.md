@@ -309,3 +309,30 @@ Audit thresholds live in historical/config.json and are engineering screening
 assumptions, not fitted circuit/tire parameters. Each refresh is a new snapshot;
 build provenance hashes both source and implementation. CI uses small artificial
 source-shaped fixtures and does not download historical races.
+
+## 2026-10-16 — F1.1 structural readiness and evidence reconciliation
+
+Version quality semantics as `f1-audit-v2`, preserving source schema 1 and all
+screening thresholds. Readiness must consume whole-stint flags, including missing
+boundaries outside observed laps; eligible lap counts alone cannot establish
+stint consistency. Preserve usable laps and legitimate unfinished retirement
+tails. Limit descriptive/dry purposes for unresolved stints without adding this
+requirement to independent pit-duration description. The supplied finisher
+regression changes from ready 4/4 / gate passed to limited 4/4 / gate blocked.
+
+Targeted official FIA evidence was checked 2026-10-17 UTC. The
+[F1.1 review](reports/f1-1-readiness-review.md#targeted-external-evidence) records
+URLs, retrieval times, hashes and page references. The 2023 PDF supports 50 pit
+boundaries while FIA HTML omits Norris's final two stops; preserve the conflict
+and require explicit source-revision/field mapping before any future adapter.
+The 2024 control sheet corroborates local events but supplies no explicit initial
+global-clear state; do not infer it from pit-exit green. The 2025 provisional
+classification supports car 27's physical participation while the later decision
+and final classification support technical DSQ. Preserve both facts separately
+and leave OpenF1's null lap result and original failed requests untouched.
+
+Keep the full gate blocked. A separately authorized retrospective cohort audit
+may assess existing eligible 2025 rows excluding car 27, with no changes to
+thresholds or control initialization. The review's 382-row proposal is not accepted
+for calibration; late-race selection, traffic/fuel confounding and missing
+counterfactual/publication evidence remain limitations. No model or policy fitted.

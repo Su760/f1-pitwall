@@ -1,3 +1,8 @@
+# F1.1 — active quality repair
+
+See [the scoped F1.1 task](f1-1-quality-readiness.md). The user authorizes execution
+and publication; no further plan approval is required. Stop after F1.1.
+
 # Task 1 / F0a — deterministic dry-race simulator
 
 Scope: Python engine, fixed schedules, CLI, synthetic scenario, versioned trace,

@@ -1,6 +1,45 @@
 # PitWall Arena status
 
+## F1.1 — quality-gate repaired; full dataset still blocked
+
+Verified 2026-10-16 local / 2026-10-17 UTC against `c503441`. Quality semantics
+are now `f1-audit-v2`: unresolved stint consistency limits lap/stint and dry-pace
+readiness even when all observed laps are individually eligible. The confirmed
+four-lap finisher / stint ending at five now retains 4/4 usable laps but has a
+blocked circuit gate. Completed retirement stints and pit-only purposes retain
+their separate meanings. Source schema, thresholds and approved spec are unchanged.
+
+The [F1.1 evidence review](reports/f1-1-readiness-review.md) records exact source
+URLs/hashes, reconciliation, reproduction commands and a proposal for further
+audit. FIA corroborates 50 2023 pit boundaries (its HTML page omits two PDF stops),
+does not establish the missing 2024 initial global-clear baseline, and separates
+2025 car 27's 57-lap physical participation from its final technical DSQ. No
+external value replaces an OpenF1 row, null or failed request. The automated
+2025 coverage result remains 19/20 until a separate evidence layer is authorized.
+
+Both retained raw caches validate. Before editing, all 12 original v1 artifacts
+were reproduced. New offline builds `historical-data/f1-1-a` and `f1-1-b` match
+all 12 files, and all nine Parquet tables match the old build. Exit **2 / partial**
+is expected. The complete candidate gate remains **blocked**; eligibility counts
+in the archived F1 section below are unchanged. V2 adds 50 unresolved 2023 stint
+rows due to missing pit evidence and zero for 2024/2025. Supplemental evidence
+does not relax the gate. A 382-row 2025-only retrospective pace cohort is a
+proposal with acceptance criteria, not an exported or calibration-ready dataset.
+
+Checks: 37 focused quality / 102 historical / 305 combined core-historical /
+250 core-API tests passed; Ruff lint/format, wheel build and synthetic CLI
+comparison/optimization/replay passed. Packaging used `.venv-api` after the
+historical environment reported `No module named pip`. Independent read-only
+code and final documentation/evidence reviews passed, with source conflicts,
+hashes and cohort counts independently verified. Hosted publication checks are
+tracked in [the F1.1 task](../tasks/f1-1-quality-readiness.md).
+No core/API/web implementation changed; unrelated local work remains intact.
+
 ## F1 — importer implemented; historical quality gate blocked
+
+The following is the archived **v1** checkpoint. Current builds use v2 and the
+F1.1 hashes/reproduction instructions linked above; they do not recreate v1 report
+hashes unless run with the original implementation.
 
 Verified 2026-10-13 against reviewed baseline
 `1c4b08177fc72306209d04ad0b04bb8815815b2a`. The separate historical package adds
@@ -333,9 +372,10 @@ independent review; no substantive correctness finding remains from this pass.
   this repository; no hook was changed or bypassed. Its proposed fix and evidence
   remain in [decisions](decisions.md#2026-10-02--global-stop-hook-diagnosis-unresolved-outside-project).
 
-## Next separately authorized milestone: F2
+## Next separately authorized task: 2025 retrospective cohort audit
 
-F1 tooling and observed suitability findings are recorded above. The current
-candidate-set quality gate is blocked; resolve or explicitly narrow unsupported
-analyses before using historical rows for F2 calibration/adaptive strategy.
-No calibration, RL, live telemetry, accounts or deployment was implemented.
+Audit the proposed 382-row 2025 cohort's source membership, exclusions, control
+boundaries, weather alignment and selection bias against the F1.1 acceptance
+criteria, keeping the full circuit gate blocked. Deliver provenance and a
+suitability decision only. F2 calibration/adaptive strategy, RL, live telemetry,
+accounts and deployment remain deferred and require separate authorization.

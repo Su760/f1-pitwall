@@ -162,6 +162,56 @@ def test_null_age_and_missing_weather_are_unknown_not_zero_or_dry():
     assert result["sessions"][0]["readiness"]["dry_pace_investigation"]["status"] == "blocked"
 
 
+def test_missing_stint_endpoint_blocks_gate_without_discarding_valid_laps():
+    tables = fixture()
+    tables["stints"][0]["lap_end"] = 5
+    tables["pit"] = [
+        row(
+            "pit",
+            driver_number=1,
+            lap_number=2,
+            date=START + timedelta(seconds=170),
+            lane_duration=24.0,
+            stop_duration=2.5,
+        )
+    ]
+    tables["pit"][0].update(effective_lane_duration=24.0, lane_duration_source="lane_duration")
+    before = deepcopy(tables)
+    result = report(tables)
+    assert tables == before
+    assert driver(result)["coverage"]["coverage_complete"] is True
+    assert result["stint_audit"][0]["flags"] == ["missing_boundary_lap"]
+    readiness = result["sessions"][0]["readiness"]
+    for purpose in ("descriptive_lap_stint", "dry_pace_investigation"):
+        assert readiness[purpose]["status"] == "limited"
+        assert "unresolved_stint_consistency" in readiness[purpose]["blockers"]
+        assert readiness[purpose]["counts"]["unresolved_stint_rows"] == 1
+        assert readiness[purpose]["stint_blocking_reasons"] == {"missing_boundary_lap": 1}
+    assert readiness["descriptive_lap_stint"]["counts"]["eligible_rows"] == 4
+    assert all(lap["descriptive_eligible"] for lap in result["lap_audit"])
+    assert readiness["pit_lane_description"]["status"] == "ready"
+    assert readiness["stationary_stop_description"]["status"] == "ready"
+    assert result["circuit_gate"]["status"] == "blocked"
+    assert result["quality_version"] == "f1-audit-v2"
+    assert "unresolved_stint_consistency" in render_markdown(result)
+
+
+def test_completed_retirement_stint_does_not_require_unfinished_tail_join():
+    tables = fixture()
+    tables["session_result"][0].update(number_of_laps=3, dnf=True)
+    tables["stints"][0]["lap_end"] = 3
+    tables["laps"][3]["lap_duration"] = None
+    result = report(tables)
+    assert result["stint_audit"][0]["flags"] == []
+    assert driver(result)["coverage"]["retirement_started_lap_numbers"] == [4]
+    assert driver(result)["coverage"]["coverage_complete"] is True
+    readiness = result["sessions"][0]["readiness"]["descriptive_lap_stint"]
+    assert readiness["counts"]["eligible_rows"] == 3
+    assert readiness["counts"]["unresolved_stint_rows"] == 0
+    assert "unresolved_stint_consistency" not in readiness["blockers"]
+    assert len(result["lap_audit"]) == 4
+
+
 def test_retirement_uses_driver_result_and_started_tail_separately():
     tables = fixture()
     tables["session_result"][0].update(number_of_laps=2, dnf=True)

@@ -1,6 +1,8 @@
 # F1 historical data contract — version 1
 
-Checked 2026-10-13. F1 audits suitability; it does not calibrate the simulator.
+Source/schema contract 1; quality semantics `f1-audit-v2` (F1.1, 2026-10-16).
+Endpoint meanings rechecked 2026-10-17 UTC. F1 audits suitability;
+it does not calibrate the simulator.
 The approved specification remains unchanged. These are retrospective analyst
 tables, never policy observations or a claim of decision-time availability.
 
@@ -143,7 +145,10 @@ per-row exclusions with overlapping reason counts AND distinct excluded counts.
 Original rows are never deleted. Criteria are versioned and thresholds are config.
 
 - Descriptive lap/stint analysis: verified complete download, valid metadata and
-  joins, independently supported lap coverage, unambiguous usable lap/stint rows.
+  joins, independently supported lap coverage, unambiguous usable lap/stint rows,
+  and no unresolved stint consistency flags, including endpoints outside the
+  observed lap range. Individually usable laps remain eligible even when an
+  inconsistent stint prevents session readiness.
 - Dry pace investigation: above plus non-opening, non-pit, positive complete timing,
   known tire age/compound, contemporaneous dry-candidate weather and no known or
   uncertain neutralization. Report eligible counts and blockers; candidate rows
@@ -161,6 +166,28 @@ Every purpose reports `ready`, `limited`, or `blocked`, supporting counts and
 explicit blockers. F1's circuit gate must not pass on partial access or unresolved
 coverage; quality failures are a valid finding, not permission to invent data.
 No tire fitting, simulator tuning, RL, live integration or arena calibration.
+
+### F1.1 quality semantics change
+
+Version `f1-audit-v2` adds `unresolved_stint_consistency` to descriptive lap/stint
+and dry-pace blockers. Both purposes expose `counts.unresolved_stint_rows` and
+overlapping `stint_blocking_reasons` counts; `stint_audit` retains source-row
+references. All stint audit flags block these purposes except the informational
+`pit_boundary_semantics_uncertain` and redundant `tyre_age_unavailable` (missing
+age already blocks via `missing:tyre_age_at_start`). This covers missing endpoints,
+invalid/gapped/overlapping ranges, pit-start disagreements, missing required
+fields, invalid values, duplicates, conflicts and unmatched joins, even if no lap
+lands on the problematic boundary. This does not alter lap eligibility, thresholds,
+normalized schemas or raw evidence. It does not add a stint requirement to pit-lane
+or stationary-duration description. The circuit gate still requires descriptive
+readiness, so individually eligible 4/4 laps cannot override a stint ending at 5.
+
+A legitimate unfinished retirement tail is not a missing completed stint endpoint:
+the stint ends at the last completed lap. The extra untimed lap remains retained
+and separately excluded under existing rules. Download completeness, row usability,
+whole-stint consistency, and purpose readiness remain distinct. Supplemental FIA
+evidence in the [F1.1 review](reports/f1-1-readiness-review.md) is a documented
+reconciliation only; it is not merged into OpenF1 tables or used to relax this gate.
 
 ## Implementation interfaces
 

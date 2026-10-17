@@ -742,7 +742,7 @@ def _purpose(eligible, total, blockers, *, unconditional=None):
     }
 
 
-def _readiness(audit, session, driver_reports, laps, pits, complete):
+def _readiness(audit, session, driver_reports, laps, pits, stints, complete):
     common = []
     if not complete:
         common.append("source_import_not_complete")
@@ -772,6 +772,17 @@ def _readiness(audit, session, driver_reports, laps, pits, complete):
         common.append("completed_lap_coverage_unresolved")
     if any(lap["descriptive_exclusion_reasons"] for lap in laps):
         common.append("excluded_or_ambiguous_lap_stint_rows")
+    # A stint can contradict the evidence beyond the observed lap range. Keep
+    # usable lap rows, but never let their eligibility hide that contradiction.
+    # Pit timestamp/boundary semantics alone are documented uncertainty; missing
+    # tyre age already has a required-field flag, so do not count it twice.
+    stint_reasons = [
+        set(stint["flags"]) - {"pit_boundary_semantics_uncertain", "tyre_age_unavailable"}
+        for stint in stints
+    ]
+    unresolved_stints = sum(bool(reasons) for reasons in stint_reasons)
+    if unresolved_stints:
+        common.append("unresolved_stint_consistency")
     descriptive = _purpose(sum(lap["descriptive_eligible"] for lap in laps), len(laps), common)
     dry_blockers = list(common)
     if any(lap["weather_classification"] == "unknown" for lap in laps):
@@ -779,6 +790,11 @@ def _readiness(audit, session, driver_reports, laps, pits, complete):
     if any(lap["neutralization"] == "unknown" for lap in laps):
         dry_blockers.append("neutralization_unknown_for_some_laps")
     dry = _purpose(sum(lap["dry_pace_eligible"] for lap in laps), len(laps), dry_blockers)
+    for purpose in (descriptive, dry):
+        purpose["counts"]["unresolved_stint_rows"] = unresolved_stints
+        purpose["stint_blocking_reasons"] = _counts(
+            reason for reasons in stint_reasons for reason in reasons
+        )
     dry["interpretation"] = (
         "Eligible rows are dry candidates only; no certified dry track or causal tire model."
     )
@@ -786,7 +802,11 @@ def _readiness(audit, session, driver_reports, laps, pits, complete):
         reason
         for reason in common
         if reason
-        not in {"completed_lap_coverage_unresolved", "excluded_or_ambiguous_lap_stint_rows"}
+        not in {
+            "completed_lap_coverage_unresolved",
+            "excluded_or_ambiguous_lap_stint_rows",
+            "unresolved_stint_consistency",
+        }
     ]
     lane_blockers = pit_common + (
         ["excluded_pit_lane_rows"] if any(not pit["lane_eligible"] for pit in pits) else []
@@ -935,7 +955,13 @@ def build_report(tables: dict[str, list[dict]], manifest: dict, config: dict) ->
                 }
             )
         readiness = _readiness(
-            audit, session_key, driver_reports, session_laps, session_pits, complete
+            audit,
+            session_key,
+            driver_reports,
+            session_laps,
+            session_pits,
+            [stint for stint in stints if stint["session_key"] == session_key],
+            complete,
         )
         sessions.append(
             {
@@ -1122,6 +1148,17 @@ def render_markdown(report: dict) -> str:
                 f"{', '.join(readiness['blockers']) or 'none under this contract'} |"
             )
         exclusions = session["lap_exclusions"]
+        descriptive = session["readiness"]["descriptive_lap_stint"]
+        lines.extend(
+            [
+                "",
+                "Unresolved stint rows: "
+                f"**{descriptive['counts']['unresolved_stint_rows']}**. "
+                "Valid lap eligibility does not certify whole-stint consistency.",
+            ]
+        )
+        for reason, count in descriptive["stint_blocking_reasons"].items():
+            lines.append(f"- `{reason}`: {count}")
         lines.extend(
             [
                 "",
