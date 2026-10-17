@@ -20,8 +20,11 @@ tests, Ruff and wheel pass. Independent read-only review verified all 152 summar
 statistics against Decimal/inclusive quantiles (maximum difference 1.50e−14 s).
 Desktop/mobile Chromium inspection verifies driver selection, gap preservation,
 17 diamonds, small samples, standalone SVG/JSON downloads, offline operation and
-all-driver fallback without JavaScript. Final review/hosted CI closure is recorded
-in [the task](../tasks/f1-3-descriptive-report.md). Approved spec and unrelated
+all-driver fallback without JavaScript. Final independent review passed.
+Implementation [`edd96e6`](https://github.com/Su760/f1-pitwall/commit/edd96e68149efd03bf69249915f5dd744e3eff08)
+is pushed; [CI 38999607994](https://github.com/Su760/f1-pitwall/actions/runs/38999607994)
+passed all four jobs, including the production-browser arena. See
+[task closure](../tasks/f1-3-descriptive-report.md). Approved spec and unrelated
 local work are preserved; the existing synthetic arena remains unchanged.
 
 **This cohort's calibration avenue is closed.** Historical description is the

@@ -22,7 +22,7 @@ reviewer reads only. Existing F1.2 code/config and core/API/web stay untouched.
 - [x] Known-answer/corruption/reconciliation tests; independent numerical check;
       two new builds; rendered desktop/mobile/selection/export inspection.
 - [x] Independent read-only review, documentation/status and scoped diff review.
-- [ ] Commit/push and verify hosted CI; close historical calibration avenue.
+- [x] Commit/push and verify hosted CI; close historical calibration avenue.
 
 Design: no added dependencies. Inline SVG plots plus per-driver SVG exports,
 HTML driver selection with accessible tables and no remote assets/fetches. Driver
@@ -64,4 +64,17 @@ an independent Decimal/inclusive-quantile calculation within 1.50e-14 seconds.
 Final independent read-only review passes: all 22 final files and published
 hashes checked, all 152 statistics independently recalculated, Markdown counts/
 rounded values checked, final screenshots inspected. No outstanding findings.
-Publication and hosted CI remain pending below.
+Publication and hosted CI verified below.
+
+Implementation commit
+[`edd96e68149efd03bf69249915f5dd744e3eff08`](https://github.com/Su760/f1-pitwall/commit/edd96e68149efd03bf69249915f5dd744e3eff08)
+is pushed to origin/main without force. [CI 38999607994](https://github.com/Su760/f1-pitwall/actions/runs/38999607994)
+passed historical, core Python 3.11/3.14 and production-browser arena jobs.
+This documentation-only closure records those results; its exact commit/CI are
+supplied in the final handoff. No generated datasets, environments, secrets or
+unrelated files were staged. The approved spec and frozen F1.2 inputs are intact.
+
+F1.3 and this bounded historical workstream are complete as descriptive work;
+the circuit gate remains blocked and this cohort's calibration avenue is closed.
+One next product proposal only: the explicitly synthetic strategy sensitivity
+lab documented in the report. No implementation or further audit was started.

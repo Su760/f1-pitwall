@@ -1,7 +1,12 @@
-# F1.3 — active descriptive report
+# F1.3 — descriptive report delivered; historical workstream closed
 
-See [scoped task](f1-3-descriptive-report.md). Execute the authorized frozen-cohort
-visual report, verify it, and publish; no fitting or new historical audit.
+See [completed task](f1-3-descriptive-report.md) and [report](../docs/reports/f1-3-descriptive-report.md).
+Open `historical-data/f1-3-a/report.html`: 382 frozen members, 365-row labelled
+sensitivity, 19 SVGs and reconciled JSON statistics. Implementation `edd96e6` is
+pushed; all four jobs in [CI 38999607994](https://github.com/Su760/f1-pitwall/actions/runs/38999607994) pass.
+Calibration is closed for this cohort; the full circuit gate stays blocked.
+Propose only a synthetic strategy sensitivity lab with explicitly assumed
+parameters. It is not implemented; no further historical audit or RL starts.
 
 # F1.2 — cohort audit complete; calibration unsupported
 
