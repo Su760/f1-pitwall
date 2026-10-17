@@ -237,6 +237,11 @@ scope. Primary references checked 2026-10-17:
 card rows and [React list rendering](https://react.dev/learn/rendering-lists) for
 stable schedule keys and ordered mapping. No new dependency or infrastructure.
 
+Implementation [`1920319`](https://github.com/Su760/f1-pitwall/commit/1920319b39758fef1b1cb3a3256a6bc40a10f8ec)
+is pushed; [CI 39056718773](https://github.com/Su760/f1-pitwall/actions/runs/39056718773)
+passes all four jobs (Python 3.11/3.14, historical and production arena/browser).
+The final documentation-closure commit/CI is supplied in the handoff.
+
 S2.1 stops here. Full historical gate remains blocked and cohort calibration
 remains closed. Next proposal only: export one chosen retained alternative trace,
 clearly labelled by rank, with existing CLI replay; do not expand search scope.

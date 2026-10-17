@@ -1,8 +1,13 @@
-# S2.1 — in progress
+# S2.1 — delivered
 
-See [scoped task/spec](s2-1-comparison.md). Implement comparison of the three
-already retained schedules, with engine stints and honest exact-tie labels.
-Authorized through verification, scoped commit/push and hosted CI.
+See [scoped task](s2-1-comparison.md) and [S2.1 contract/evidence](../docs/s2-optimization-spec.md#s21--retained-top-three-comparison-contract).
+Three retained schedules now have engine stints, exact-tie metadata and aligned
+comparison cards on a shared lap scale. 331 core/API, 129 historical and 42 browser
+cases pass; two independent reviews have no outstanding finding. Implementation
+`1920319` is pushed; [CI 39056718773](https://github.com/Su760/f1-pitwall/actions/runs/39056718773)
+passes all four jobs. Existing search, numerical behavior and historical evidence
+are preserved. Stop after S2.1. Next proposal only: export a chosen retained
+alternative trace, labelled by rank and verified with CLI replay.
 
 # S2 — delivered
 
@@ -12,8 +17,8 @@ Explicit bounded search, complete-result UI and replayable exports are implement
 backend/client reviews have no outstanding findings. Implementation `4304f43` is
 pushed; [CI 39054603883](https://github.com/Su760/f1-pitwall/actions/runs/39054603883)
 passes all four jobs. Existing challenges, S1.1 behavior and historical evidence
-are preserved. Stop after S2. Proposed next task only: show the existing top-three
-schedules side by side, with stints/gaps; no added search scope or calibration.
+are preserved. The proposed top-three comparison was subsequently authorized
+and delivered as S2.1 above, without added search scope or calibration.
 
 # S1.1 — delivered
 

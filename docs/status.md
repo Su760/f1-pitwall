@@ -20,8 +20,11 @@ All 42 production desktop/mobile browser cases pass without retries, including
 existing challenge/map/search regressions, actual downloaded trace replay and
 two identical CLI recomputations. Rendered 375/768/1024/1440px layouts inspected;
 one supplementary capture issue was fixed in the test harness and regenerated.
-Ordinary lint/typecheck/build, Ruff and wheel checks pass. Implementation and
-hosted CI completion are recorded in the task and final handoff.
+Ordinary lint/typecheck/build, Ruff and wheel checks pass. Implementation
+[`1920319`](https://github.com/Su760/f1-pitwall/commit/1920319b39758fef1b1cb3a3256a6bc40a10f8ec)
+is pushed; [CI 39056718773](https://github.com/Su760/f1-pitwall/actions/runs/39056718773)
+passes all four jobs (Python 3.11/3.14, historical and production arena/browser).
+The final documentation-closure commit/CI is supplied in the handoff.
 
 331 core/API and 129 offline historical tests pass; 34 focused backend/API cases
 include direct engine-stint verification and no-extra-work assertions. Existing

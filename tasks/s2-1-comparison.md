@@ -11,7 +11,7 @@ commit/push and hosted CI. Stop after S2.1. No search/model/historical changes.
       invalidation, keyboard and downloaded winner replay; inspect desktop/mobile.
 - [x] Obtain separate read-only backend/client reviews, resolve reproduced findings.
 - [x] Run applicable gates; record evidence in S2 spec and status.
-- [ ] Inspect scoped staged changes, commit/push without force, verify hosted CI.
+- [x] Inspect scoped staged changes, commit/push without force, verify hosted CI.
 
 Allowed edits: `src/pitwall/lab_optimization.py`, `tests/test_lab_optimization.py`,
 `apps/api/tests/test_optimization_api.py`, `web/lib/lab.ts`,
@@ -54,4 +54,8 @@ passing geometry. Stabilized test capture with instant positioning plus two
 paint frames, then regenerated and visually inspected it; no application change.
 Valid responsive captures are under ignored `web/test-results/s21-responsive/`.
 Before-implementation regression output was expected `KeyError: 'rank'` (four
-new cases); all now pass. Hosted verification pending the implementation push.
+new cases); all now pass. Implementation
+[`1920319`](https://github.com/Su760/f1-pitwall/commit/1920319b39758fef1b1cb3a3256a6bc40a10f8ec)
+is pushed; [CI 39056718773](https://github.com/Su760/f1-pitwall/actions/runs/39056718773)
+passes all four jobs (Python 3.11/3.14, historical and production arena/browser).
+S2.1 is complete; final documentation-closure commit/CI is supplied in the handoff.
