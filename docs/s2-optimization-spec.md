@@ -108,6 +108,11 @@ Next's route announcer (scoped to the optimizer section). npm commands initially
 run at repository root returned `ENOENT ... package.json`; all actual npm gates
 ran from `web/`. No remaining failed gate is hidden by these corrections.
 
+Implementation [`4304f43`](https://github.com/Su760/f1-pitwall/commit/4304f43952d8c9f165d0be2f8065c54f3a4cd914)
+is pushed. [CI 39054603883](https://github.com/Su760/f1-pitwall/actions/runs/39054603883)
+passes all four jobs: Python 3.11/3.14, historical and production arena/browser.
+The final documentation-closure commit/CI is supplied in the handoff.
+
 ### Actual tools and references
 
 UI/UX Pro Max instructions read at

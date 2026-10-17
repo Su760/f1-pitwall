@@ -1,8 +1,13 @@
-# S2 — in progress
+# S2 — delivered
 
-See [scoped task](s2-optimization.md) and [bounded spec](../docs/s2-optimization-spec.md).
-Explicit authorization covers implementation, verification, commit/push and CI.
-Preserve S1.1 behavior and historical evidence.
+See [scoped task](s2-optimization.md) and [spec/evidence](../docs/s2-optimization-spec.md).
+Explicit bounded search, complete-result UI and replayable exports are implemented.
+327 core/API, 129 historical and 36 desktop/mobile browser cases pass. Independent
+backend/client reviews have no outstanding findings. Implementation `4304f43` is
+pushed; [CI 39054603883](https://github.com/Su760/f1-pitwall/actions/runs/39054603883)
+passes all four jobs. Existing challenges, S1.1 behavior and historical evidence
+are preserved. Stop after S2. Proposed next task only: show the existing top-three
+schedules side by side, with stints/gaps; no added search scope or calibration.
 
 # S1.1 — delivered
 
@@ -10,7 +15,7 @@ See [scoped plan](s1-1-review.md). User authorizes implementation, verification,
 commit/push and hosted CI. Preserve numerical/API/export behavior and historical
 evidence. Implementation `34126a8` is pushed; [CI 39012839475](https://github.com/Su760/f1-pitwall/actions/runs/39012839475)
 passes all four jobs. 28 browser, 297 core/API and 129 historical tests pass.
-S2 remains a proposal only.
+The separately authorized S2 milestone is delivered above.
 
 # S1 — synthetic sensitivity lab delivered
 

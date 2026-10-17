@@ -21,8 +21,11 @@ ordinary web lint with generated artifacts, typecheck and production build.
 Distinct backend/client read-only reviews found no outstanding issue. Independent
 Decimal enumeration checks 36 control combinations; desktop/mobile rendered
 layouts were inspected by root and client reviewer. All 36 production browser
-cases pass without retries (18 challenges, 10 S1/S1.1, 8 S2). Hosted CI completion
-is recorded in the task and final GitHub handoff.
+cases pass without retries (18 challenges, 10 S1/S1.1, 8 S2). Implementation
+[`4304f43`](https://github.com/Su760/f1-pitwall/commit/4304f43952d8c9f165d0be2f8065c54f3a4cd914)
+is pushed; [CI 39054603883](https://github.com/Su760/f1-pitwall/actions/runs/39054603883)
+passes all four jobs: Python 3.11/3.14, historical and production arena/browser.
+Final documentation-closure commit/CI is supplied in the handoff.
 
 UI/UX Pro Max used; previously unavailable Ponytail/PStack/Thermo Nuclear tools
 remain unavailable and were not invoked. S1.1 map accessibility, existing
