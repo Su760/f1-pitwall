@@ -281,7 +281,8 @@ differ by last-bit floating-point rounding from elapsed-time subtraction.
 All state, metrics, rankings, and future traces are generated in Python. A
 pre-submit payload exposes only current/past situation, original legal masks
 with reasons, the briefing, continuation, objective, and public assumptions.
-Client configurations, snapshots, scores, and optimizer requests are not accepted.
+Challenge endpoints do not accept client configurations, snapshots, scores or
+optimizer requests.
 At most four alternatives over fixtures with at most 20 total laps are evaluated.
 The request body is capped at 1024 bytes. This is a local stateless service, not
 a multi-user deployment or abuse-resistant hosted platform.
@@ -347,3 +348,22 @@ faster schedule. Below 0.001 s the winner is labelled near-tie. Sampled grid
 transitions are not exact crossovers, probability or confidence estimates.
 No traffic, fuel, weather, driver variation or adaptive policy is introduced.
 The historical cohort calibration avenue stays closed and full circuit gate blocked.
+
+
+## S2 explicit fixed-schedule optimization
+
+The separate lab action reuses S1 controls/resolution and the unchanged exhaustive
+optimizer. All fixed schedules under the baseline start, inventory and terminal
+rules are candidates; it does not search starting compounds, parameter values,
+uncertainty, historical data or adaptive policies. It never optimizes map points.
+Server limits: 600 candidates / 7,200 potential search laps; top three retained.
+Two benchmark simulations add 24 potential laps. Budgets bound each request;
+client aborts can leave bounded server work finishing in the thread pool.
+
+Default optimum is 1113.550 s (medium after 5), gains 0.300/11.150 s. Pit 7.15
+finds 1102.700 s versus tied 1103.000 benchmarks. Pit 0 chooses soft after 4,
+medium after 8 at 1088.700 s; exact compound ordering chooses it over the equal
+medium-then-soft benchmark. Near-equal floating-point values are not collapsed:
+S1 comparison tolerances do not affect optimizer ranking. Browser rounding to
+three decimals is display only. Completeness plus engine legality is required
+for any optimum claim. Model scope and historical gate remain unchanged.

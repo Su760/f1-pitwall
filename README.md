@@ -104,6 +104,51 @@ points. Numeric values retain full precision; JSON whitespace may differ after
 browser export. No historical parameters or calibration are used. See the
 [lab spec](docs/sensitivity-lab-spec.md) for limits and tie conventions.
 
+## Explicit strategy search (S2)
+
+On [/lab](http://127.0.0.1:3000/lab), choose the three assumptions, then activate
+**Find best legal strategy** below the comparison/map exports. Search runs only
+on that action. Edits (including equivalent numeric text) and reset clear the
+winner and exports; activate it again to search the new settings.
+
+The label **Best legal fixed schedule under these synthetic assumptions** refers
+to all fixed 0–2 stop schedules with the existing 12-lap soft start, inventory and
+legality rules. Every candidate uses the Python engine. Server-owned limits are
+600 candidates / 7,200 potential search laps, plus 24 benchmark laps; top three
+results are retained without truncating enumeration. Limits are per request,
+not an aggregate public-service quota.
+
+With degradation/warm-up at 1, each search evaluates **529 candidates / 462 legal**:
+
+| Pit loss | Best elapsed | Winning pit boundaries | Gain over one-/two-stop |
+| --- | --- | --- | --- |
+| 18 s | 1113.550 s | after 5 → medium | 0.300 / 11.150 s |
+| 7.15 s | 1102.700 s | after 5 → medium | 0.300 / 0.300 s |
+| 0 s | 1088.700 s | after 4 → soft, after 8 → medium | 7.150 / 0.000 s |
+
+The zero-pit winner is an exact tie with the benchmark; existing deterministic
+compound ordering picks the displayed schedule. Full precision determines all
+rankings; three-decimal display may hide smaller differences. Improvements are
+benchmark minus winner. This is synthetic fixed-schedule optimality only.
+
+Download **Export optimized scenario**, **Export winning trace** and **Export
+search record**, then move them into ignored `traces/`. Reproduce from repository
+root using the recorded limits:
+
+```sh
+.venv-api/bin/python -m pitwall replay traces/lab-winning-trace.json --scenario traces/lab-optimized-scenario.json
+.venv-api/bin/python -m pitwall optimize traces/lab-optimized-scenario.json --top 3 --max-candidates 600 --max-lap-evaluations 7200 --output traces/lab-recomputed-winner.json
+```
+
+Replay verifies every saved engine record; optimize independently repeats the
+complete search and writes the same winner trace. The versioned search record
+includes controls, input hashes, resolved configuration, counts, full-precision
+top-three ranking, benchmark improvements and both exported documents. CLI JSON
+whitespace can differ from browser downloads; parsed trace content is identical.
+The CLI does not authenticate hashes or verify the entire search-record wrapper.
+No historical calibration, adaptive planning, stochastic model or RL. See the
+[S2 spec and verification evidence](docs/s2-optimization-spec.md).
+
 ## Arena checks
 
 With the dependencies above installed, stop any manually running servers on

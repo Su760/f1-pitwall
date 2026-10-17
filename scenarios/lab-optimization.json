@@ -1,0 +1,6 @@
+{
+  "optimization_version": 1,
+  "top_k": 3,
+  "max_candidates": 600,
+  "max_lap_evaluations": 7200
+}

@@ -20,6 +20,8 @@ from apps.api.challenges import (
     evaluate,
 )
 from pitwall.actions import Action
+from pitwall.lab_optimization import load_search_settings, optimize_lab
+from pitwall.optimizer import SearchTooLarge
 from pitwall.sensitivity import evaluate_lab, load_lab
 from pitwall.serialization import validate_json
 
@@ -35,16 +37,20 @@ class EvaluationRequest(BaseModel):
     compare_action: ActionName | None = None
 
 
-class LabRequest(BaseModel):
+class LabControlsRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
 
     pit_loss_s: float
     degradation_multiplier: float
     warmup_multiplier: float
+
+
+class LabRequest(LabControlsRequest):
     grid_size: int
 
 
 LAB_SETTINGS = Path(__file__).resolve().parents[2] / "scenarios" / "sensitivity-lab.json"
+SEARCH_SETTINGS = LAB_SETTINGS.with_name("lab-optimization.json")
 
 
 app = FastAPI(title="PitWall Arena", docs_url=None, redoc_url=None, openapi_url=None)
@@ -140,6 +146,8 @@ async def _read_request(request: Request, model=EvaluationRequest):
         raise _invalid(
             "Expected finite lab controls and integer grid_size."
             if model is LabRequest
+            else "Expected exactly three finite numeric lab controls."
+            if model is LabControlsRequest
             else "Expected a valid challenge identity, integer version, and typed action."
         ) from exc
 
@@ -180,7 +188,12 @@ async def evaluation(request: Request) -> dict[str, Any]:
 def lab_metadata(request: Request):
     _query(request)
     settings, _, identity = load_lab(LAB_SETTINGS)
-    return {"api_version": 1, **settings, "source": identity}
+    return {
+        "api_version": 1,
+        **settings,
+        "source": identity,
+        "optimization": load_search_settings(SEARCH_SETTINGS),
+    }
 
 
 @app.post("/api/v1/lab")
@@ -194,4 +207,28 @@ async def lab_evaluation(request: Request):
     except (ValueError, OverflowError) as exc:
         raise _invalid(
             "Controls or grid exceed the supported illustrative ranges/work limit."
+        ) from exc
+
+
+@app.post("/api/v1/lab/optimize")
+async def lab_optimization(request: Request):
+    _query(request)
+    body = await _read_request(request, LabControlsRequest)
+    try:
+        return await run_in_threadpool(
+            optimize_lab, LAB_SETTINGS, SEARCH_SETTINGS, body.model_dump()
+        )
+    except SearchTooLarge as exc:
+        raise ChallengeError(
+            422,
+            "search_too_large",
+            "Complete search exceeds the server work budget; no candidates evaluated.",
+        ) from exc
+    except (ValueError, OverflowError) as exc:
+        raise _invalid("Controls must be within the supported illustrative ranges.") from exc
+    except RuntimeError as exc:
+        raise ChallengeError(
+            503,
+            "search_unavailable",
+            "A complete legal search result is unavailable. Please retry.",
         ) from exc

@@ -9,6 +9,7 @@ export type LabMetadata = {
     Control,
     { label: string; min: number; max: number; default: number; step: number }
   >;
+  optimization: SearchSettings;
   grid_default: number;
   grid_max: number;
 };
@@ -45,4 +46,34 @@ export type LabResult = {
     axes: { pit_loss_s: number[]; degradation_multiplier: number[] };
     rows: Point[][];
   };
+};
+
+export type SearchSettings = {
+  optimization_version: 1;
+  top_k: number;
+  max_candidates: number;
+  max_lap_evaluations: number;
+};
+export type OptimizationResult = {
+  api_version: 1;
+  optimization_version: 1;
+  controls: Controls;
+  label: string;
+  search: {
+    search_complete: boolean;
+    candidate_count: number;
+    legal_count: number;
+    limits: { max_candidates: number; max_lap_evaluations: number };
+    top_k: number;
+    tie_break: string;
+  };
+  best: {
+    schedule: { name: string; stops: { after_lap: number; compound: string }[] };
+    total_elapsed_s: number;
+    legal: boolean;
+    stints: Stint[];
+  };
+  benchmarks: { name: string; total_elapsed_s: number; improvement_s: number }[];
+  scenario: unknown;
+  trace: unknown;
 };

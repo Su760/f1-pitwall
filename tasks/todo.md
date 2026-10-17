@@ -1,3 +1,9 @@
+# S2 — in progress
+
+See [scoped task](s2-optimization.md) and [bounded spec](../docs/s2-optimization-spec.md).
+Explicit authorization covers implementation, verification, commit/push and CI.
+Preserve S1.1 behavior and historical evidence.
+
 # S1.1 — delivered
 
 See [scoped plan](s1-1-review.md). User authorizes implementation, verification,

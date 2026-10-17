@@ -306,3 +306,23 @@
     min-height: 110px;
   }
 }
+.lab-optimization {
+  border-top: 3px solid var(--cyan);
+  margin-top: 48px;
+}
+.lab-optimization .lab-button {
+  min-height: 44px;
+}
+.lab-search-button {
+  border-color: var(--cyan);
+}
+.lab-search-button[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.lab-optimization .lab-stint {
+  min-width: 72px;
+}
+.lab-pit-schedule {
+  padding-left: 20px;
+}

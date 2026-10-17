@@ -1,5 +1,39 @@
 # PitWall Arena status
 
+## S2 — explicit bounded strategy search
+
+The lab now offers **Find best legal strategy** for selected synthetic controls.
+The unchanged optimizer evaluates all 529 candidates (462 legal); only complete
+legal results are shown. Server-owned 600-candidate/7,200-search-lap budgets and
+fixed top-three retention preserve preflight rejection and exact tie ordering.
+Search runs only on activation. Edits/reset invalidate results and exports;
+late responses cannot restore them. See [spec/evidence](s2-optimization-spec.md),
+[scoped task](../tasks/s2-optimization.md), [API](api-contract.md#s2-explicit-lab-optimization--optimization-version-1-2026-10-17)
+and [usage/reproduction](../README.md#explicit-strategy-search-s2).
+
+At default multipliers: pit18 → 1113.550 s (medium after 5), gains 0.300/11.150 s;
+pit7.15 → 1102.700 s; pit0 → 1088.700 s (soft after 4, medium after 8 by exact tie
+ordering). Winning trace and resolved scenario use existing formats; downloaded
+files replay and independently optimize to identical trace content twice.
+
+327 core/API and 129 offline historical tests pass, as do Ruff, packaging,
+ordinary web lint with generated artifacts, typecheck and production build.
+Distinct backend/client read-only reviews found no outstanding issue. Independent
+Decimal enumeration checks 36 control combinations; desktop/mobile rendered
+layouts were inspected by root and client reviewer. All 36 production browser
+cases pass without retries (18 challenges, 10 S1/S1.1, 8 S2). Hosted CI completion
+is recorded in the task and final GitHub handoff.
+
+UI/UX Pro Max used; previously unavailable Ponytail/PStack/Thermo Nuclear tools
+remain unavailable and were not invoked. S1.1 map accessibility, existing
+challenges and historical evidence are preserved. Budgets are per request; this
+is still a local tool, not a public multi-user service. Manual screen-reader
+certification is not claimed. Full historical gate stays blocked; calibration
+for the frozen cohort remains closed. No F2, adaptive planner or RL.
+
+Stop after S2. Next proposal only: display the existing top-three legal fixed
+schedules side by side with their stints and gaps; no additional search scope.
+
 ## S1.1 — bounded lab review and accessibility repair
 
 The lab now has one map Tab stop with directional navigation, normal exit and
@@ -17,9 +51,9 @@ rendered 375/768/1024/1440 checks pass. Implementation `34126a8` is pushed;
 [CI 39012839475](https://github.com/Su760/f1-pitwall/actions/runs/39012839475)
 passes all four jobs, including production browser tests.
 
-S1.1 stops here. S2 is only a proposed explicit “Find best legal strategy” action
-using the existing bounded optimizer at selected settings. No S2 implementation,
-calibration, adaptive planning or RL; full historical gate remains blocked.
+S1.1 stopped at that scope. Its proposed S2 action is now delivered separately
+above; calibration, adaptive planning and RL remain deferred, and the full
+historical gate remains blocked.
 
 ## S1 — synthetic strategy sensitivity lab
 

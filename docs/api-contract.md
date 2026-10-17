@@ -221,7 +221,7 @@ Fixed one-/two-stop schedules come from `scenarios/synthetic.json`. Both must
 finish legally through the engine. Maximum work is 441×2 + 2 simulations of 12
 laps = 10,608 lap evaluations; validate bounds before simulation. Bounded CPU work
 runs in the API thread pool. This is a local tool, not a public multi-user service
-with a global request/concurrency quota. No exhaustive optimizer is invoked.
+with a global request/concurrency quota. These comparison endpoints do not invoke the optimizer.
 
 Numerical ties use |delta| ≤ 1e-9 s. Outside this tolerance, sign determines the
 faster schedule; |delta| < 0.001 s adds near-tie. The UI rounds totals to three
@@ -229,3 +229,58 @@ decimals and gives additional digits for tiny differences. Export/recomputation
 preserves full precision. Hashes identify inputs, not authenticity. Browser abort,
 request revision and input-identity guards prevent superseded results displaying
 for newer controls, including during debounce. See [S1 spec](sensitivity-lab-spec.md).
+
+
+## S2 explicit lab optimization — optimization version 1 (2026-10-17)
+
+`GET /api/v1/lab` additionally supplies `optimization`: version, fixed `top_k: 3`,
+`max_candidates: 600`, `max_lap_evaluations: 7200`. Reading metadata and computing
+the S1 grid never run a search. `POST /api/v1/lab/optimize` accepts exactly:
+
+```json
+{"pit_loss_s":18,"degradation_multiplier":1,"warmup_multiplier":1}
+```
+
+Same strict finite numeric controls, ranges, 1024-byte JSON reader, duplicate/key
+rejection, no query fields and no-store responses as S1. No client budgets, top-k,
+grid, scenario or schedules. Reuse S1 scaling and the same baseline scenario.
+Offload bounded computation to the thread pool. Server configuration is
+`scenarios/lab-optimization.json`, separate from unchanged S1 export settings.
+
+The existing optimizer preflights both search budgets before any simulation;
+then evaluates the entire fixed-schedule space and returns three retained legal
+results. Benchmark simulations happen only after successful complete search and
+add 24 potential laps. Current actual upper work: 529×12 + 24 = 6,372 potential
+lap evaluations. An abort invalidates the client result but need not stop a search
+already running on the server. No aggregate concurrency/rate quota is claimed.
+
+Failures: 422 `invalid_request` for invalid controls, 413 `body_too_large`,
+422 `search_too_large` for preflight rejection (no candidates evaluated),
+503 `search_unavailable` when no complete legal search result can be returned.
+No partial winner or internal exception detail is exposed in these errors.
+
+Success is a JSON result/export record with:
+
+- `api_version: 1`, `optimization_version: 1`, exact `controls`, synthetic `label`.
+- `source`: model version and SHA-256 hashes of baseline scenario, S1 settings and
+  optimization settings. Hashes identify input bytes, not authenticity.
+- `search`: completion, candidate/legal counts and counts by stops, conservative
+  search work, separate benchmark work, limits, top-k, scope/tie rules, and
+  full-precision `ranked` schedules/times/gaps. Schedule format is existing
+  `{name, stops: [{after_lap, compound}]}`; gap is elapsed minus best.
+- `best`: schedule, full-precision elapsed seconds, legality, stints and boundaries.
+- `benchmarks`: name, elapsed seconds and `improvement_s` (benchmark minus winner).
+- `scenario`: existing loader version 1 with resolved configuration and original
+  two benchmark schedules. `trace`: existing strict version-1 winning trace.
+
+Full precision ranks time first; exact ties use fewer stops, boundary tuple, then
+soft/medium/hard order. S1 tolerance never alters optimization ranking. Display
+rounds to 0.001 s; zero displayed gain need not imply equality. The UI accepts only
+a complete legal response for the requested controls. A new component lifetime
+on every edit/reset removes old results/exports, aborts old fetches and ignores
+late callbacks; an immediate in-flight guard prevents duplicate activation. Search
+is invoked only by the explicit button. Retry retains keyboard focus on that same
+button; S1.1 map navigation/exit is unchanged.
+
+See [S2 specification](s2-optimization-spec.md) and
+[CLI export reproduction](../README.md#explicit-strategy-search-s2).

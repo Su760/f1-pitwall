@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import LabOptimizer from "./lab-optimizer";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { request } from "@/lib/api";
 import type {
@@ -46,6 +47,7 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
       controlNames.map((k) => [k, String(metadata.controls[k].default)]),
     ) as Record<Control, string>;
   const [inputs, setInputs] = useState(defaults);
+  const [inputRevision, setInputRevision] = useState(0);
   const [activeCell, setActiveCell] = useState(0);
   const cells = useRef<(HTMLButtonElement | null)[]>([]);
   const resetButton = useRef<HTMLButtonElement>(null);
@@ -144,6 +146,7 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
     cells.current[row * size + column]?.focus();
   }
   function update(key: Control, value: string) {
+    setInputRevision((n) => n + 1);
     setInputs((old) => ({ ...old, [key]: value }));
     setAnswer(null);
     setSelected(null);
@@ -151,6 +154,7 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
     setRetry((n) => n + 1); // Re-request even if text changes from 18 to 18.0.
   }
   function reset() {
+    setInputRevision((n) => n + 1);
     setInputs(defaults());
     setAnswer(null);
     setSelected(null);
@@ -197,8 +201,9 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
       </section>
       <p className="lab-explanation">
         Degradation scales both slope and cap. Warm-up scales every entry,
-        including the starting set. All other parameters, rules and schedules
-        stay fixed.
+        including the starting set. All other parameters and rules stay fixed.
+        The comparison and map keep their two benchmark schedules; the explicit
+        search below evaluates all legal fixed schedules.
       </p>
       {!valid ? (
         <p role="alert">
@@ -458,6 +463,13 @@ function Lab({ metadata }: { metadata: LabMetadata }) {
           </section>
         </>
       )}
+      <LabOptimizer
+        key={inputRevision}
+        controls={controls}
+        valid={valid}
+        settings={metadata.optimization}
+        download={download}
+      />
     </>
   );
 }
@@ -485,7 +497,7 @@ export default function SensitivityLab() {
     <main className="lab-page">
       <header className="lab-header">
         <Link href="/">← PitWall Arena challenges</Link>
-        <span>Synthetic lab · S1</span>
+        <span>Synthetic lab · S2</span>
       </header>
       <div className="lab-intro">
         <h1 ref={heading} tabIndex={-1}>
@@ -495,7 +507,7 @@ export default function SensitivityLab() {
           Compare the fixed one-stop and two-stop schedules across illustrative
           pit-loss, tire degradation and warm-up assumptions.
         </p>
-        <strong>12 laps. Two fixed schedules. One deterministic engine.</strong>
+        <strong>12 laps. Two benchmarks. One deterministic engine.</strong>
       </div>
       {metadata ? (
         <Lab metadata={metadata} />
