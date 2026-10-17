@@ -1,7 +1,11 @@
-# F1.1 — active quality repair
+# F1.1 — quality repair complete; historical gate still blocked
 
-See [the scoped F1.1 task](f1-1-quality-readiness.md). The user authorizes execution
-and publication; no further plan approval is required. Stop after F1.1.
+See [the completed F1.1 task](f1-1-quality-readiness.md) and
+[readiness review](../docs/reports/f1-1-readiness-review.md). Implementation commit
+`880f11aaf0db603676dc877dbe432abf5901b0da` is pushed; all four jobs in
+[CI 38997040963](https://github.com/Su760/f1-pitwall/actions/runs/38997040963) passed.
+The full data gate remains blocked. Stop after F1.1; the proposed cohort audit
+requires separate authorization and does not include F2 fitting.
 
 # Task 1 / F0a — deterministic dry-race simulator
 

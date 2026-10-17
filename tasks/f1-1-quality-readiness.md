@@ -15,7 +15,7 @@ The approved specification and synthetic arena remain unchanged.
 - [x] Reconcile targeted FIA 2023 pit, 2024 control baseline, 2025 car 27 evidence.
 - [x] Run focused/full relevant checks; rebuild twice and compare artifacts.
 - [x] Obtain independent read-only review; resolve substantive scoped findings.
-- [ ] Finish report/status/decisions, inspect staged files, commit/push and check CI.
+- [x] Finish report/status/decisions, inspect staged files, commit/push and check CI.
 
 Diagnosis at baseline c503441: `quality.py:282` detects a missing stint endpoint;
 `quality.py:525` only propagates selected start-boundary flags to actual laps;
@@ -39,3 +39,10 @@ Independent read-only code and final evidence/doc reviews passed, including
 independent cache validation, PDF/HTML comparison and cohort count verification.
 Full findings and the unimplemented 382-row cohort proposal are in
 [the readiness review](../docs/reports/f1-1-readiness-review.md).
+
+Published implementation `880f11aaf0db603676dc877dbe432abf5901b0da` to origin/main
+without force. [CI 38997040963](https://github.com/Su760/f1-pitwall/actions/runs/38997040963)
+completed successfully: historical, core 3.11/3.14, and arena (API/web/browser).
+This documentation follow-up records the verified outcome; its own commit and
+CI result are supplied in the final handoff. No dataset or unrelated file was
+staged. F1.1 is complete; full historical readiness remains blocked.

@@ -263,6 +263,13 @@ a new identifiable import; a changed upstream snapshot need not match these hash
 Expected output: partial import, `f1-audit-v2`, blocked circuit gate and the counts
 above. A corrupt cache must fail, not produce a replacement observation.
 
+Implementation [`880f11a`](https://github.com/Su760/f1-pitwall/commit/880f11aaf0db603676dc877dbe432abf5901b0da)
+was pushed to origin/main without force. [Hosted CI 38997040963](https://github.com/Su760/f1-pitwall/actions/runs/38997040963)
+passed all four jobs: historical, core Python 3.11/3.14 and arena (API, web checks,
+production browser tests). This documentation follow-up records that observed
+result; its own commit/CI are reported in the final handoff. Software CI success
+does not establish historical completeness or calibration suitability.
+
 Remaining blockers are explicit above. **One next task:** separately authorize
 the proposed 2025 cohort audit, delivering only provenance-backed membership,
 exclusions and suitability review. F2 calibration and RL remain deferred.

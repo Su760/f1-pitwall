@@ -31,8 +31,12 @@ Checks: 37 focused quality / 102 historical / 305 combined core-historical /
 comparison/optimization/replay passed. Packaging used `.venv-api` after the
 historical environment reported `No module named pip`. Independent read-only
 code and final documentation/evidence reviews passed, with source conflicts,
-hashes and cohort counts independently verified. Hosted publication checks are
-tracked in [the F1.1 task](../tasks/f1-1-quality-readiness.md).
+hashes and cohort counts independently verified. Implementation
+[`880f11a`](https://github.com/Su760/f1-pitwall/commit/880f11aaf0db603676dc877dbe432abf5901b0da)
+is pushed; [CI 38997040963](https://github.com/Su760/f1-pitwall/actions/runs/38997040963)
+passed all four jobs, including the production-browser arena. This documentation
+follow-up records that verified result; its own commit/CI are in the final handoff.
+See [the completed F1.1 task](../tasks/f1-1-quality-readiness.md).
 No core/API/web implementation changed; unrelated local work remains intact.
 
 ## F1 — importer implemented; historical quality gate blocked
