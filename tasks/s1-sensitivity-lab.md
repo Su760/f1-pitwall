@@ -18,7 +18,7 @@ Root owns edits; independent reviewer reads only.
 - [x] Add strict API and discoverable responsive lab with stale-response protection.
 - [x] Focused math/API/browser tests; visible reversal/reset/rapid changes, exports.
 - [x] Independent read-only review; repository checks; documentation/status.
-- [ ] Inspect staging, commit/push, check hosted CI; stop at usable S1.
+- [x] Inspect staging, commit/push, check hosted CI; stop at usable S1.
 
 Implementation choices: standard library core; reuse existing request-size parser,
 Next proxy and UI styles where suitable. Dedicated scoped lab CSS. Teal/amber
@@ -47,4 +47,10 @@ replays exactly and two canonical outputs are byte-identical. Ignored evidence:
 traces/lab-{scenario,result,comparison,verified,verified-second}.json and web test
 results. Existing next-env.d.ts restored byte-for-byte; approved spec SHA-256
 518ebe5e9e6473266d36338c41975054233b3e4b2ab091c4ac772588834671b3 unchanged.
-Final independent review has no outstanding findings. Await scoped commit/hosted CI.
+Final independent review has no outstanding findings.
+
+Publication: implementation commit `83636f7ff6911c33de32fa09e3c40e259ee97d5a`
+pushed to origin/main without force. [CI 39009001641](https://github.com/Su760/f1-pitwall/actions/runs/39009001641)
+passed historical, core Python 3.11/3.14 and arena (including production-browser)
+jobs. This docs-only closure records observed evidence; final handoff reports its
+own commit/CI. No further task started. Unrelated local work remains preserved.

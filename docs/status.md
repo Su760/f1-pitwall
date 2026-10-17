@@ -22,8 +22,10 @@ verified 47 focused tests and 1,323 grid points against independent arithmetic
 (maximum discrepancy 4.55e-13 s). All 24 production-browser desktop/mobile cases
 pass, including the preserved 18 challenge flows. Rendered screenshots were inspected by root and reviewer.
 Actual browser downloads replay exactly; two canonical full-record builds match
-byte-for-byte. Independent final review has no outstanding findings. Publication
-CI is pending for the scoped commit.
+byte-for-byte. Independent final review has no outstanding findings.
+Implementation [`83636f7`](https://github.com/Su760/f1-pitwall/commit/83636f7ff6911c33de32fa09e3c40e259ee97d5a)
+is pushed; [CI 39009001641](https://github.com/Su760/f1-pitwall/actions/runs/39009001641)
+passed all four jobs, including production-browser checks. S1 is delivered; stop here.
 
 S1 uses explicitly synthetic assumptions only. Historical reports/challenges and
 the approved project spec are preserved. The full circuit gate remains blocked;

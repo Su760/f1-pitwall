@@ -1,9 +1,11 @@
-# S1 — synthetic sensitivity lab locally verified; publication pending
+# S1 — synthetic sensitivity lab delivered
 
 See [scoped task](s1-sensitivity-lab.md) and [spec](../docs/sensitivity-lab-spec.md).
 Implemented `/lab`, bounded engine/API comparisons, sampled map and offline exports.
 297 core/API, 356 core/historical and 24 desktop/mobile browser tests pass.
-Independent review and actual downloaded export replay pass. No historical calibration.
+Independent review and actual downloaded export replay pass. Implementation
+`83636f7` is pushed; [CI 39009001641](https://github.com/Su760/f1-pitwall/actions/runs/39009001641)
+passes all four jobs. No historical calibration. S1 stops here.
 
 # F1.3 — descriptive report delivered; historical workstream closed
 
