@@ -1,5 +1,35 @@
 # PitWall Arena status
 
+## F1.3 — descriptive report delivered; historical workstream closed
+
+The self-contained local report is `historical-data/f1-3-a/report.html`; run
+`open historical-data/f1-3-a/report.html` from the repository root. It provides
+19 driver/stint charts, exact lap coverage, counts, median/IQR, deletion annotations,
+a labelled sensitivity table and SVG/JSON exports. See [F1.3 delivery and exact
+commands](reports/f1-3-descriptive-report.md).
+
+All **382** frozen members are preserved; **17** retrospective deletion tags
+remain in the primary view; sensitivity contains **365** rows. All 1,129 source
+laps reconcile against 747 exclusions. Manifest/artifact/source/code/quality
+hashes are validated before analysis. Two fresh builds match all **22 files**
+byte-for-byte and return expected exit 2 (partial source; full circuit gate
+blocked). No source import, eligibility change, model fitting or calibration.
+
+Verification: 19 focused / 332 core-historical (129 historical) / 250 core-API
+tests, Ruff and wheel pass. Independent read-only review verified all 152 summary
+statistics against Decimal/inclusive quantiles (maximum difference 1.50e−14 s).
+Desktop/mobile Chromium inspection verifies driver selection, gap preservation,
+17 diamonds, small samples, standalone SVG/JSON downloads, offline operation and
+all-driver fallback without JavaScript. Final review/hosted CI closure is recorded
+in [the task](../tasks/f1-3-descriptive-report.md). Approved spec and unrelated
+local work are preserved; the existing synthetic arena remains unchanged.
+
+**This cohort's calibration avenue is closed.** Historical description is the
+completed deliverable; the blocked full quality gate is not claimed passed.
+One next product proposal: a synthetic strategy sensitivity lab with explicitly
+assumed pit-loss, degradation and warm-up parameters and reproducible comparisons.
+It is not implemented; no further audit, calibration or RL is started.
+
 ## F1.2 — retrospective cohort audited; calibration unsupported
 
 Verified 2026-10-17 UTC from retained snapshot and unchanged `f1-audit-v2`.

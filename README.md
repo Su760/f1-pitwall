@@ -377,3 +377,37 @@ circuit gate. The verified selection has 382 rows from 19 drivers on laps 36–5
 including 17 retrospectively deletion-tagged laps. It supports limited recorded
 elapsed-lap description; **it cannot support whole-race tire calibration or strategy
 simulation**. See [F1.2 suitability and exact reproduction](docs/reports/f1-2-cohort-audit.md).
+
+### Open the descriptive report (F1.3)
+
+The finished local artifact is `historical-data/f1-3-a/report.html`:
+
+```sh
+open historical-data/f1-3-a/report.html
+```
+
+It works offline without a server: select a driver/stint, inspect elapsed time
+against race lap with gaps and deletion annotations, and export SVG charts or
+JSON statistics. All 382 frozen primary rows remain visible; a separately
+labelled 365-row sensitivity comparison omits the 17 tagged rows. It is not
+certified clean and establishes no final legal status or causal tire degradation.
+
+Reproduce into an unused directory with the verified retained F1.2 artifacts:
+
+```sh
+CODE=0
+.venv-historical/bin/python -m pitwall_historical.descriptive \
+  historical-data/raw/20261013T173926.193125Z-f1d80d3ff360 \
+  --cohort historical-data/f1-2-a --config historical/descriptive-2025.json \
+  --output historical-data/f1-3-new || CODE=$?
+test "$CODE" -eq 2 && open historical-data/f1-3-new/report.html
+```
+
+Exit 2 preserves partial source / blocked full-gate status; exit 1 is failure.
+The input manifest pin and artifact/source/code hashes are checked before
+analysis. Changing or rebuilding the frozen F1.2 evidence under a different code
+bundle does not bypass the pin. Generated reports stay outside Git.
+See [definitions, verification and closure](docs/reports/f1-3-descriptive-report.md).
+This cohort's calibration avenue is closed. The next proposed product task is a
+synthetic strategy sensitivity lab with explicitly assumed parameters; it has
+not been implemented.

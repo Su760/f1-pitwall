@@ -1,3 +1,8 @@
+# F1.3 — active descriptive report
+
+See [scoped task](f1-3-descriptive-report.md). Execute the authorized frozen-cohort
+visual report, verify it, and publish; no fitting or new historical audit.
+
 # F1.2 — cohort audit complete; calibration unsupported
 
 See [the completed F1.2 task](f1-2-cohort-audit.md) and

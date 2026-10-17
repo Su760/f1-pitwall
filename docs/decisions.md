@@ -367,3 +367,32 @@ or new dependencies. Chronological within-event blocks cannot establish held-out
 event generalization; adjacent-lap random splits are inappropriate. No new race
 source requests were made. The one proposed next task is a bounded descriptive
 report of the frozen members, with deletion annotations and explicit limits.
+
+## 2026-10-17 UTC — F1.3 frozen descriptive report and historical closure
+
+Pin the verified F1.2 artifact manifest in historical/descriptive-2025.json;
+validate raw cache, all artifact hashes, shared provenance, recorded code and
+regenerated v2 quality before reading durations. Preserve exact primary membership
+and source identities. A report-write completion never promotes the full gate.
+Adding the report generator does not rewrite the frozen F1.2 code manifest.
+
+Use linear sample quantiles at (n−1)*p (Hyndman–Fan type 7), matching the inclusive
+convention in [Python statistics documentation](https://docs.python.org/3/library/statistics.html#statistics.quantiles)
+checked 2026-10-17. Handle singleton/empty groups explicitly; show n and mark n<5
+as a display caution only. IQR is descriptive spread, not inferential uncertainty.
+An independent Decimal/inclusive-quantile calculation verifies all 152 reported
+quartile/median/IQR values. No pace model or independent-lap assumption is used.
+
+Generate standalone SVG with standard-library serialization, an embedded HTML
+viewer and embedded download data; no dependencies or hosted service added.
+[SVG polyline documentation](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/polyline)
+and [Playwright screenshot guidance](https://playwright.dev/docs/screenshots)
+checked 2026-10-17. Split each line at absent race laps; align by race-lap index,
+not clock time. Show 17 deletion diamonds without dropping primary rows; label
+365-row omission as sensitivity, never certified clean or final legal status.
+
+The [delivered report](reports/f1-3-descriptive-report.md) completes this bounded
+historical workstream. Calibration remains unsupported and closed for this cohort;
+the full circuit gate remains blocked. Propose only a synthetic strategy sensitivity
+lab with explicitly assumed parameters and reproducible comparisons. Do not feed
+historical summaries into simulator parameters, begin another audit, or start RL.
