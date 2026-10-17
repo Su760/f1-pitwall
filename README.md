@@ -356,3 +356,24 @@ forbid network access. The separate CI historical job never downloads a race;
 existing core/API/browser jobs remain in place. See [data contract](docs/data-contract.md),
 [dated sources/decisions](docs/decisions.md), and [status](docs/status.md) for the
 exact source evidence, limitations and reproduction of the local audit.
+
+### Retrospective 2025 cohort audit (F1.2)
+
+Audit the retained snapshot without an import, fitting or threshold changes:
+
+```sh
+SNAPSHOT=historical-data/raw/20261013T173926.193125Z-f1d80d3ff360
+CODE=0
+.venv-historical/bin/python -m pitwall_historical.cohort "$SNAPSHOT" \
+  --selection historical/cohort-2025.json --output historical-data/cohort-new || CODE=$?
+test "$CODE" -eq 2
+```
+
+Use a fresh output directory each time. Expected exit 2 preserves this snapshot's
+partial source status; exit 1 indicates failure. `membership.json`,
+`exclusions.json`, `audit.json` and `manifest.json` reconcile all source laps with
+source/config/quality/code hashes. Artifact write completion does not pass the
+circuit gate. The verified selection has 382 rows from 19 drivers on laps 36–57,
+including 17 retrospectively deletion-tagged laps. It supports limited recorded
+elapsed-lap description; **it cannot support whole-race tire calibration or strategy
+simulation**. See [F1.2 suitability and exact reproduction](docs/reports/f1-2-cohort-audit.md).

@@ -1,3 +1,9 @@
+# F1.2 — active retrospective cohort audit
+
+See [the scoped F1.2 task](f1-2-cohort-audit.md). Authorized to execute and publish;
+use retained evidence and unchanged v2 eligibility only. Stop after suitability
+assessment; no model fitting, calibration or RL.
+
 # F1.1 — quality repair complete; historical gate still blocked
 
 See [the completed F1.1 task](f1-1-quality-readiness.md) and

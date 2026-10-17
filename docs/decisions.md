@@ -336,3 +336,34 @@ may assess existing eligible 2025 rows excluding car 27, with no changes to
 thresholds or control initialization. The review's 382-row proposal is not accepted
 for calibration; late-race selection, traffic/fuel confounding and missing
 counterfactual/publication evidence remain limitations. No model or policy fitted.
+
+## 2026-10-17 UTC — F1.2 scoped retrospective suitability
+
+Keep `f1-audit-v2`, source schema, thresholds and full gate unchanged. Add a
+separate offline `f1.2-cohort-v1` audit of session 10014's existing eligible rows,
+excluding driver 27 explicitly. The retained snapshot yields 382 members and
+747 distinct exclusions; overlapping reasons are not added as distinct rows.
+Record source-row identities and hashes for snapshot, config, selection, quality
+and code. Retain failed requests/nulls and annotate 17 deletion-tagged selected
+laps without reselection. Describe recorded elapsed laps, not legal clean pace.
+
+The [cohort report](reports/f1-2-cohort-audit.md) validates nine endpoints,
+19-driver coverage, stints, prior weather and control windows, then demonstrates
+`age = race_lap + stint_offset`. With one selected stint/compound per driver,
+23 predictor columns have rank 20; driver and stint offsets are also inseparable.
+Do not interpret a full-rank reduced design that omits driver heterogeneity as
+causal identification. This cohort's whole-race calibration/strategy avenue is
+closed. Descriptive summaries are supported within stated limits; within-event
+prediction is a conditional future proposal, not performed or validated here.
+Missing stationary/publication times affect only purposes requiring them.
+
+Method references checked 2026-10-17 UTC: official
+[statsmodels rank-deficiency guidance](https://www.statsmodels.org/stable/pitfalls.html#rank-deficient-exog-perfect-multicollinearity)
+warns that fitting need not fail on rank deficiency; inspect the design directly.
+Official [scikit-learn cross-validation guidance](https://scikit-learn.org/stable/modules/cross_validation.html)
+distinguishes dependent time-series/grouped observations from iid splitting.
+Our exact rational algebra uses the standard library only, with no outcome fitting
+or new dependencies. Chronological within-event blocks cannot establish held-out-
+event generalization; adjacent-lap random splits are inappropriate. No new race
+source requests were made. The one proposed next task is a bounded descriptive
+report of the frozen members, with deletion annotations and explicit limits.

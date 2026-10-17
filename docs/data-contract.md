@@ -203,3 +203,37 @@ rows (timestamps are aware datetime) and returns JSON-safe deterministic audit.
 `normalize.rebuild(snapshot, output, config=None) -> dict` writes only a fresh
 output directory. CLI is `python -m pitwall_historical import --cache PATH
 --config historical/config.json` and `rebuild SNAPSHOT --output PATH`.
+
+## F1.2 retrospective cohort audit
+
+`python -m pitwall_historical.cohort SNAPSHOT --selection historical/cohort-2025.json
+--output NEW_DIRECTORY` is an offline audit layered on unchanged `f1-audit-v2`.
+It validates the retained cache and regenerates quality from the embedded snapshot
+config; no threshold override is accepted. Version `f1.2-cohort-v1` selects session
+10014's existing dry-pace-eligible physical rows excluding driver 27. Counts are
+outputs, not acceptance thresholds. This is separate purpose suitability, never
+promotion of the full circuit gate or general session readiness.
+
+Membership and exclusions retain source request/zero-based row identity and
+original quality fields; extra exclusion reasons overlap. Their disjoint union
+must equal every original session lap. A separate audit checks included-driver
+coverage, all their stint consistency, unique member joins, prior weather and
+half-open control intervals. The additional control checker conservatively
+requires review of any state-changing/ambiguous command since the last global
+clear, even if v2 resolves a later sector clear. Failures block scoped suitability
+without changing membership. Explicit car/lap deletion notices are retrospective
+annotations; control lap numbers are not substituted for driver's lap numbers.
+These laps remain recorded elapsed intervals, not certified legal clean pace.
+
+Four deterministic JSON artifacts record snapshot/manifest, config, selection,
+quality report and historical code hashes plus Python version. New output paths
+are mandatory. Artifact manifest `complete` refers to successful writes only;
+source partial status, failures and the original circuit gate remain visible.
+CLI exit 2 means partial source or blocked scoped description, with artifacts
+written; exit 1 means execution failure. Cache corruption fails before writing.
+The machine report includes marginal/joint coverage and exact predictor-matrix
+ranks without reading pace outcomes for those diagnostics or fitting a model.
+See [the F1.2 report](reports/f1-2-cohort-audit.md) for observed results, suitability
+limits and reproduction. Missing stationary/publication data block only purposes
+that require them; the cohort supplies neither incremental pit loss nor an online
+feature table. No dependency, normalized schema or v2 quality semantics changed.

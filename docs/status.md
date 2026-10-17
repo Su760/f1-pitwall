@@ -1,6 +1,40 @@
 # PitWall Arena status
 
+## F1.2 — retrospective cohort audited; calibration unsupported
+
+Verified 2026-10-17 UTC from retained snapshot and unchanged `f1-audit-v2`.
+The [F1.2 cohort audit](reports/f1-2-cohort-audit.md) reproduces **382 members /
+747 distinct exclusions / 1,129 source laps**, session 10014 excluding driver 27.
+All nine session endpoints, included-driver coverage, 59 source stints and 382
+control/weather interval checks validate. The 19 selected driver/stints span
+laps 36–57; 17 members carry retrospective deletion notices and remain annotated
+recorded elapsed laps. No new source import or threshold change was made.
+
+Limited late-race description is supported. Within-event prediction is only a
+conditional proposal requiring chronological validation; no experiment was run.
+Whole-race tire calibration and strategy simulation are **not supported**: age,
+race lap, compound and driver/stint effects are inseparable (rank 20 of 23),
+with early-race/young-tire and independent-event evidence absent. That calibration
+avenue is closed for this cohort. The full circuit gate stays **blocked**, and
+the original partial cache, failed 2023 pit request and 2025 result null persist.
+No F2, fitting, RL or arena changes occurred.
+
+Two new offline builds `historical-data/f1-2-a` and `f1-2-b` match all four JSON
+artifacts byte-for-byte; both return expected exit 2 / partial. The regenerated
+v2 quality hash matches F1.1 exactly. The report records hashes and commands.
+Local checks: 8 focused cohort, 313 combined core/historical (110 historical),
+250 core/API tests; Ruff lint/format and wheel build pass. Independent read-only
+code and final evidence/document reviews found no actionable issue. Pushed
+CI is recorded in the task closure. Browser tests are delegated to the unchanged
+hosted arena job; no local UI implementation was touched. The approved spec and
+unrelated local work remain intact. See [scoped task](../tasks/f1-2-cohort-audit.md).
+One proposed next task: a descriptive report of the frozen members with deletion
+annotations, counts/dispersion and race-lap-aligned plots; no calibration.
+
 ## F1.1 — quality-gate repaired; full dataset still blocked
+
+The following is the archived F1.1 checkpoint; F1.2 above completes its proposed
+cohort suitability audit without promoting the full gate.
 
 Verified 2026-10-16 local / 2026-10-17 UTC against `c503441`. Quality semantics
 are now `f1-audit-v2`: unresolved stint consistency limits lap/stint and dry-pace
