@@ -71,11 +71,19 @@ def optimize_lab(settings_path: Path, search_path: Path, controls: dict) -> dict
                 ),
                 "ranked": [
                     {
+                        "rank": rank,
                         "schedule": asdict(entry.schedule),
                         "total_elapsed_s": entry.result.total_elapsed_s,
                         "gap_s": entry.gap_s,
+                        "stints": [asdict(stint) for stint in entry.result.stints],
+                        "exact_tie_ranks": [
+                            other_rank
+                            for other_rank, other in enumerate(search.ranked, start=1)
+                            if other_rank != rank
+                            and other.result.total_elapsed_s == entry.result.total_elapsed_s
+                        ],
                     }
-                    for entry in search.ranked
+                    for rank, entry in enumerate(search.ranked, start=1)
                 ],
             },
             "best": {

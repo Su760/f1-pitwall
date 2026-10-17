@@ -1,5 +1,46 @@
 # PitWall Arena status
 
+## S2.1 — retained top-three strategy comparison
+
+The explicit lab search now shows its three retained schedules in server order:
+rank, pit decisions, elapsed time, Python gap and engine-derived stints. Desktop
+cards align on shared rows; mobile cards stack. All timelines use the same 1–12
+race-lap scale, with compound letters plus full names/ranges. Short stints keep
+their true widths. This is race-lap alignment, not simultaneous clock time.
+
+Python marks exact elapsed-time ties among the three. Rounded-only matches are
+explicitly untied and full-precision values remain visible. Defaults are
+1113.550/1113.850/1114.500 s, gaps 0/0.300/0.950 s, medium after 5/6/4.
+Pit7.15 ranks 2/3 exactly tie at 1103.000 s; pit0 ranks 1/2 exactly tie at
+1088.700 s with unchanged deterministic order. Pit7.1501 gives rounded-alike
+1103.000 s values for ranks 2/3 that are correctly not labelled exact ties.
+The unchanged trace export is clearly **rank 1 only**.
+
+All 42 production desktop/mobile browser cases pass without retries, including
+existing challenge/map/search regressions, actual downloaded trace replay and
+two identical CLI recomputations. Rendered 375/768/1024/1440px layouts inspected;
+one supplementary capture issue was fixed in the test harness and regenerated.
+Ordinary lint/typecheck/build, Ruff and wheel checks pass. Implementation and
+hosted CI completion are recorded in the task and final handoff.
+
+331 core/API and 129 offline historical tests pass; 34 focused backend/API cases
+include direct engine-stint verification and no-extra-work assertions. Existing
+search scope/counts/budgets, S1 numbers, explicit activation and revision-based
+invalidation remain unchanged. Independent backend review compared 36 settings
+with S2: stripping only new fields gives exactly the previous response. Distinct
+client review inspected code/tests and desktop/mobile screenshots with no
+outstanding finding. UI/UX Pro Max instructions/searches were used; unavailable
+tools from S1.1 remain unavailable and were not invoked. See
+[contract and evidence](s2-optimization-spec.md#s21--retained-top-three-comparison-contract)
+and [scoped task](../tasks/s2-1-comparison.md).
+
+No robustness, confidence or real-world superiority follows from these gaps.
+This remains a bounded synthetic local tool; no manual screen-reader or
+cross-browser certification is claimed. Historical calibration stays closed and
+the full circuit gate stays blocked. Stop after S2.1. One next proposal only:
+allow exporting a chosen retained alternative's engine trace with an explicit
+rank label and verified CLI replay; no additional search scope.
+
 ## S2 — explicit bounded strategy search
 
 The lab now offers **Find best legal strategy** for selected synthetic controls.
@@ -34,8 +75,8 @@ is still a local tool, not a public multi-user service. Manual screen-reader
 certification is not claimed. Full historical gate stays blocked; calibration
 for the frozen cohort remains closed. No F2, adaptive planner or RL.
 
-Stop after S2. Next proposal only: display the existing top-three legal fixed
-schedules side by side with their stints and gaps; no additional search scope.
+S2 stopped at that scope. Its proposed comparison is delivered separately as
+S2.1 above, with no additional search scope.
 
 ## S1.1 — bounded lab review and accessibility repair
 

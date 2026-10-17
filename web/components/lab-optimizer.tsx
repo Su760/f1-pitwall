@@ -112,23 +112,6 @@ export default function LabOptimizer({
               Complete search · {result.search.candidate_count} candidates ·{" "}
               {result.search.legal_count} legal · legal finish
             </p>
-            <ul className="lab-pit-schedule">
-              {result.best.schedule.stops.map((stop) => (
-                <li key={stop.after_lap}>Pit after lap {stop.after_lap} → {stop.compound}</li>
-              ))}
-            </ul>
-            <div className="lab-timeline" aria-label="Best schedule tire-stint timeline">
-              {result.best.stints.map((stint) => (
-                <div
-                  className={"lab-stint lab-" + stint.compound}
-                  key={stint.first_lap}
-                  style={{ flex: stint.last_lap - stint.first_lap + 1 }}
-                >
-                  <b>{stint.compound}</b>
-                  <span>laps {stint.first_lap}–{stint.last_lap}</span>
-                </div>
-              ))}
-            </div>
             <dl className="lab-costs">
               {result.benchmarks.map((benchmark) => (
                 <div key={benchmark.name}>
@@ -144,12 +127,89 @@ export default function LabOptimizer({
               This optimum applies only to the configured synthetic fixed-schedule search.
             </p>
           </article>
+          <section className="lab-ranked" aria-labelledby="ranked-heading">
+            <div className="lab-section-heading">
+              <h3 id="ranked-heading">Compare the top three schedules</h3>
+              <p>
+                Shared race-lap scale, 1–12; this is not simultaneous clock time.
+                S = soft, M = medium, H = hard. Each segment is a separate tire set.
+              </p>
+              <p>
+                Times and gaps round to 0.001 s. Equal displayed values do not
+                establish an exact tie: only the explicit tie labels below do.
+                Exact ties keep this deterministic order: fewer stops, earlier
+                pit-boundary tuple, then soft/medium/hard compound order.
+                Small gaps do not establish robustness, confidence or real-world superiority.
+              </p>
+            </div>
+            <ol className="lab-ranked-cards" aria-label="Top three legal fixed schedules">
+              {result.search.ranked.map((entry) => (
+                <li className="lab-ranked-card" key={entry.schedule.name}>
+                  <h4>Rank {entry.rank}</h4>
+                  <div className="lab-ranked-metrics">
+                    <p className="lab-total" data-testid={"rank-" + entry.rank + "-total"}>
+                      {entry.total_elapsed_s.toFixed(3)} <small>s</small>
+                    </p>
+                    <p data-testid={"rank-" + entry.rank + "-gap"}>
+                      Gap to fastest: {entry.gap_s.toFixed(3)} s
+                    </p>
+                  </div>
+                  <p className="lab-ranked-tie" data-testid={"rank-" + entry.rank + "-tie"}>
+                    {entry.exact_tie_ranks.length
+                      ? "Exact elapsed-time tie with rank " + entry.exact_tie_ranks.join(", ") + "."
+                      : "No exact elapsed-time tie among these three."}
+                  </p>
+                  <ul className="lab-pit-schedule">
+                    {entry.schedule.stops.map((stop) => (
+                      <li key={stop.after_lap}>
+                        Pit after lap {stop.after_lap} → {stop.compound}
+                      </li>
+                    ))}
+                  </ul>
+                  <div
+                    className="lab-ranked-timeline"
+                    role="img"
+                    aria-label={"Rank " + entry.rank + " race-lap timeline: " + entry.stints.map(
+                      (stint) => stint.compound + " laps " + stint.first_lap + "–" + stint.last_lap,
+                    ).join("; ")}
+                  >
+                    <p className="lab-ranked-axis-label">Race lap</p>
+                    <div className="lab-ranked-axis" aria-hidden="true">
+                      {Array.from({ length: 12 }, (_, i) => <span key={i}>{i + 1}</span>)}
+                    </div>
+                    <div className="lab-ranked-track" aria-hidden="true">
+                      {entry.stints.map((stint) => (
+                        <span
+                          className={"lab-ranked-segment lab-" + stint.compound}
+                          key={stint.first_lap}
+                          style={{ gridColumn: stint.first_lap + " / " + (stint.last_lap + 1) }}
+                        >
+                          {stint.compound[0].toUpperCase()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <ul className="lab-ranked-stints" aria-label={"Rank " + entry.rank + " tire stints"}>
+                    {entry.stints.map((stint) => (
+                      <li key={stint.first_lap}>
+                        <strong>{stint.compound}</strong>: laps {stint.first_lap}–{stint.last_lap}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="lab-ranked-precision">
+                    Full precision: elapsed {String(entry.total_elapsed_s)} s;
+                    gap {String(entry.gap_s)} s.
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </section>
           <div className="lab-export">
             <h3>Reproduce this search</h3>
-            <p>Download all three files. The search record includes controls, source hashes, limits, counts and the top three schedules.</p>
+            <p>Download all three files. The search record includes all three schedules and stints. The winning trace belongs to rank 1 only; it does not contain alternative traces.</p>
             <div>
               <button className="lab-button" onClick={() => download("lab-optimized-scenario.json", result.scenario)}>Export optimized scenario</button>
-              <button className="lab-button" onClick={() => download("lab-winning-trace.json", result.trace)}>Export winning trace</button>
+              <button className="lab-button" onClick={() => download("lab-winning-trace.json", result.trace)}>Export rank 1 winning trace</button>
               <button className="lab-button" onClick={() => download("lab-search.json", result)}>Export search record</button>
             </div>
             <p>From the repository root, replay the downloaded trace:</p>

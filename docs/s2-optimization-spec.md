@@ -147,4 +147,96 @@ Unrelated next-env edit and downloaded original spec are preserved locally.
 
 Stop after S2. One proposed next product task: display the already returned top
 three legal fixed schedules side by side, with their stints and gaps, without
-adding search scope or historical/adaptive modeling. This proposal is not implemented.
+adding search scope or historical/adaptive modeling. This proposal was subsequently authorized and delivered as S2.1 below.
+
+
+## S2.1 — retained top-three comparison contract
+
+Authorized from S2 `b02a670`. Consume `search.ranked` in server order. Add each
+entry's one-based `rank`, `stints` serialized directly from its retained engine
+result, and `exact_tie_ranks`: other retained ranks whose full-precision elapsed
+time equals this entry exactly. No tolerance, formatted comparison, extra engine
+simulation or second search. Existing version-1 fields, winning trace, scenario,
+budgets, top-k and ranking/tie rules retain their meanings.
+
+Show three aligned cards on desktop and a vertical stack on mobile: rank,
+pit-after-lap decisions, elapsed time, engine gap to fastest and stints. Each
+race-lap timeline uses identical twelve-column widths with visible 1–12 labels.
+Short stints retain their true width; compound letters on bars and full compound
+names/lap ranges below them provide textual identification. This is race-lap
+alignment, not simultaneous elapsed-clock alignment. Card content rows align
+across desktop columns. No card interaction adds Tab stops.
+
+Each card identifies exact ties only from Python's `exact_tie_ranks`; untied
+entries explicitly say no exact elapsed-time tie among these three. Display
+elapsed/gaps to 0.001 s and expose the full-precision serialized values in text.
+Equal rounded values therefore cannot manufacture exact ties. Exact ties retain
+fewer stops, boundary-tuple, soft/medium/hard ordering. Small gaps say nothing
+about robustness, confidence or real-world superiority.
+
+The trace download is explicitly **rank 1 only**; its filename/schema remain
+unchanged. The search record gains the ranked fields. Edits/reset remove the
+entire comparison and all optimization exports. Existing explicit activation,
+request lifetime guards, limits, retry focus and map keyboard behavior remain.
+
+Acceptance: defaults rank pits after 5/6/4 to medium; totals
+1113.550/1113.850/1114.500 s and gaps 0/0.300/0.950 s. At pit7.15 ranks 2/3
+exactly tie at 1103.000 s, both 0.300 s behind the winner. At pit0 ranks 1/2
+exactly tie at 1088.700 s; preserve existing compound-order tie-break. Verify
+stints against engine results, equal-display-but-unequal-time behavior, no added
+simulation/search work, desktop/mobile alignment, stale/reset invalidation,
+keyboard and actual downloaded winner replay. Independent read-only backend
+and client reviews precede the authorized commit/push and hosted CI check.
+
+
+### S2.1 verification evidence — 2026-10-17
+
+- 34 focused backend/API cases and 331 complete core/API tests pass. Tests added
+  before implementation initially failed with `KeyError: 'rank'`, proving the
+  existing response lacked the new contract; all four new cases now pass.
+  Retained stints match fresh engine replay of each schedule, including separate
+  soft-to-fresh-soft sets. Both work-budget rejections and S2 acceptance remain.
+  Spies verify one optimizer invocation, 529 candidate simulations and two
+  benchmark simulations: zero extra simulations for comparison serialization.
+- 129 offline historical tests, Ruff lint/format and wheel build pass. Ordinary
+  npm lint with retained generated artifacts, typecheck and production build pass.
+- All 42 desktop/mobile production browser cases pass without retries (18
+  existing challenge, 10 S1/S1.1, 8 S2 and 6 S2.1 cases). Actual downloaded
+  scenario/winning trace replay through the existing CLI; two CLI recomputations
+  equal the downloaded trace and each other byte-for-byte. Six focused S2.1
+  desktop/mobile browser cases cover ordered cards, totals/gaps,
+  exact ties at pit7.15/pit0, rounded-only match at pit7.1501, matching timeline
+  widths/coordinates, one-lap stint widths, accessible descriptions, keyboard
+  search→exports flow, reset and equivalent-edit removal. The existing S2 tests
+  now explicitly check removal of every card and the rank-1 export label.
+- Root inspected actual default desktop/mobile, rounded-only and one-lap-stint
+  screenshots; independent client reviewer inspected default, exact-tie,
+  rounded-only and short-stint cases. Additional generated layout evidence at
+  375/768/1024/1440px is under ignored `web/test-results/s21-responsive/`.
+  A supplementary 1024px capture was initially blank after rapid viewport
+  resizing despite passing geometry; stabilized the test's instant positioning
+  and paint wait, reran the targeted case and inspected the regenerated image.
+  No application change was needed. Root inspected the resized layouts, with no
+  page overflow; lap axes/segments are readable and correctly scaled.
+- Independent read-only backend reviewer `/root/s21_backend_review` ran the
+  34 focused cases and checked 36 control combinations against S2 `b02a670`.
+  Removing only `rank`, `stints`, `exact_tie_ranks` makes every response identical
+  to baseline, including counts/ranking, source hashes, scenario and winning trace.
+  Every winning trace replayed; exact-tie relationships are symmetric and exact.
+- Independent read-only client reviewer `/root/s21_client_review` checked data
+  use, semantics, layout, tie text, stale/reset behavior, keyboard flow and winner
+  export labeling; inspected real rendered screenshots. Neither reviewer found
+  an outstanding issue. Client reviewer did not claim independent browser execution.
+
+UI/UX Pro Max used from the same installed path/identity documented above; root
+and client reviewer read its actual instructions and ran its documented design
+system and React/UX searches. Applied existing-theme responsive layout, semantic
+ordered lists and text alongside color; generic redesign suggestions were outside
+scope. Primary references checked 2026-10-17:
+[W3C Grid Level 2 subgrids](https://www.w3.org/TR/css-grid-2/#subgrids) for aligned
+card rows and [React list rendering](https://react.dev/learn/rendering-lists) for
+stable schedule keys and ordered mapping. No new dependency or infrastructure.
+
+S2.1 stops here. Full historical gate remains blocked and cohort calibration
+remains closed. Next proposal only: export one chosen retained alternative trace,
+clearly labelled by rank, with existing CLI replay; do not expand search scope.

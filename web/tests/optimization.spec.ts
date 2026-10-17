@@ -28,7 +28,7 @@ test("explicit search acceptance, keyboard focus and downloaded CLI replay", asy
   await expect(page.getByRole("button", { name: "Export optimized scenario" })).toBeFocused();
   await page.keyboard.press("Shift+Tab");
   await expect(button).toBeFocused();
-  for (const label of ["Export optimized scenario", "Export winning trace", "Export search record"]) {
+  for (const label of ["Export optimized scenario", "Export rank 1 winning trace", "Export search record"]) {
     const [download] = await Promise.all([
       page.waitForEvent("download"),
       page.getByRole("button", { name: label, exact: true }).click(),
@@ -58,7 +58,8 @@ test("explicit search acceptance, keyboard focus and downloaded CLI replay", asy
     const before = calls;
     await page.getByLabel(pit, { exact: true }).fill(value);
     await expect(page.getByTestId("optimization-result")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Export winning trace" })).toHaveCount(0);
+    await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Export rank 1 winning trace" })).toHaveCount(0);
     await expect(page.getByTestId("one-stop-total")).toHaveText(value === "0" ? "1095.850 s" : "1103.000 s");
     expect(calls).toBe(before);
     await button.click();
@@ -72,6 +73,7 @@ test("explicit search acceptance, keyboard focus and downloaded CLI replay", asy
   await page.locator(".lab-optimization").screenshot({ path: info.outputPath("optimization.png") });
   await page.getByRole("button", { name: "Reset assumptions" }).click();
   await expect(page.getByTestId("optimization-result")).toHaveCount(0);
+  await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Reset assumptions" })).toBeFocused();
   await expect(page.getByTestId("one-stop-total")).toHaveText("1113.850 s");
   expect(calls).toBe(3);
@@ -111,26 +113,31 @@ test("in-flight duplicates and stale responses cannot restore reset or edited re
   release();
   await oldDone;
   await expect(page.getByTestId("optimization-result")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Export winning trace" })).toHaveCount(0);
+  await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Export rank 1 winning trace" })).toHaveCount(0);
   expect(calls).toBe(1);
   await button.click();
   await expect(page.getByTestId("optimized-total")).toHaveText("1113.550 s");
   await page.getByLabel(pit, { exact: true }).fill("18.0");
   await expect(page.getByTestId("optimization-result")).toHaveCount(0);
+  await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
   await expect(page.getByTestId("one-stop-total")).toHaveText("1113.850 s");
   expect(calls).toBe(2);
   await button.click();
   await expect(page.getByTestId("optimized-total")).toHaveText("1113.550 s");
   await page.getByLabel("Degradation multiplier", { exact: true }).fill("2");
   await expect(page.getByTestId("optimization-result")).toHaveCount(0);
+  await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
   await button.click();
   await expect(page.getByTestId("optimization-result")).toContainText("degradation ×2");
   await page.getByLabel("Warm-up multiplier", { exact: true }).fill("0");
   await expect(page.getByTestId("optimization-result")).toHaveCount(0);
+  await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
   await button.click();
   await expect(page.getByTestId("optimization-result")).toContainText("warm-up ×0");
   await page.getByRole("button", { name: "Reset assumptions" }).click();
   await expect(page.getByTestId("optimization-result")).toHaveCount(0);
+  await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
   await page.getByLabel(pit, { exact: true }).fill("41");
   await button.focus();
   await page.keyboard.press("Enter");
@@ -160,6 +167,7 @@ test("failure, incomplete response and retry preserve keyboard focus", async ({ 
   await page.keyboard.press("Enter");
   await expect(page.locator(".lab-optimization").getByRole("alert")).toContainText("No complete result for these assumptions");
   await expect(page.getByTestId("optimization-result")).toHaveCount(0);
+  await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
   await expect(button).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByTestId("optimized-total")).toHaveText("1113.550 s");
@@ -210,5 +218,6 @@ test("a late old search cannot replace a newer winner or its export", async ({ p
   await expect(page.getByTestId("optimized-total")).toHaveText("1113.550 s");
   await page.getByRole("button", { name: "Reset assumptions" }).click();
   await expect(page.getByTestId("optimization-result")).toHaveCount(0);
+  await expect(page.locator(".lab-ranked-card")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Export search record" })).toHaveCount(0);
 });

@@ -54,6 +54,14 @@ export type SearchSettings = {
   max_candidates: number;
   max_lap_evaluations: number;
 };
+export type RankedStrategy = {
+  rank: number;
+  schedule: { name: string; stops: { after_lap: number; compound: string }[] };
+  total_elapsed_s: number;
+  gap_s: number;
+  stints: Stint[];
+  exact_tie_ranks: number[];
+};
 export type OptimizationResult = {
   api_version: 1;
   optimization_version: 1;
@@ -66,6 +74,7 @@ export type OptimizationResult = {
     limits: { max_candidates: number; max_lap_evaluations: number };
     top_k: number;
     tie_break: string;
+    ranked: RankedStrategy[];
   };
   best: {
     schedule: { name: string; stops: { after_lap: number; compound: string }[] };

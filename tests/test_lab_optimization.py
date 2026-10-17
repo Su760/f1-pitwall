@@ -102,3 +102,82 @@ def test_resolution_scales_all_tires_and_starting_warmup():
     assert record["scenario"]["configuration"] == expected
     assert record["trace"]["configuration"] == expected
     assert record["trace"]["laps"][0]["warmup_s"] == 0.5
+
+
+@pytest.mark.parametrize(
+    "pit,totals,gaps,names,ties",
+    [
+        (
+            18,
+            [1113.55, 1113.85, 1114.5],
+            [0, 0.3, 0.95],
+            ["optimized-5-medium", "optimized-6-medium", "optimized-4-medium"],
+            [[], [], []],
+        ),
+        (
+            7.15,
+            [1102.7, 1103, 1103],
+            [0, 0.3, 0.3],
+            ["optimized-5-medium", "optimized-6-medium", "optimized-4-soft-8-medium"],
+            [[], [3], [2]],
+        ),
+        (
+            0,
+            [1088.7, 1088.7, 1089.1],
+            [0, 0, 0.4],
+            ["optimized-4-soft-8-medium", "optimized-4-medium-8-soft", "optimized-3-soft-7-medium"],
+            [[2], [1], []],
+        ),
+        (
+            7.1501,
+            [1102.7001, 1103.0001, 1103.0002],
+            [0, 0.3, 0.3001],
+            ["optimized-5-medium", "optimized-6-medium", "optimized-4-soft-8-medium"],
+            [[], [], []],
+        ),
+    ],
+)
+def test_ranked_stints_and_exact_ties_from_retained_results(pit, totals, gaps, names, ties):
+    from dataclasses import asdict
+
+    from pitwall.actions import Compound
+    from pitwall.engine import simulate
+    from pitwall.optimizer import optimize
+    from pitwall.policies import FixedSchedule, PitStop
+    from pitwall.serialization import json_value
+
+    controls = {**CONTROLS, "pit_loss_s": pit}
+    with (
+        patch("pitwall.lab_optimization.optimize", wraps=optimize) as search_call,
+        patch("pitwall.optimizer.simulate", wraps=simulate) as search_sim,
+        patch("pitwall.sensitivity.simulate", wraps=simulate) as benchmark_sim,
+    ):
+        record = optimize_lab(LAB, SEARCH, controls)
+        search_call.assert_called_once()
+        assert search_sim.call_count == 529
+        assert benchmark_sim.call_count == 2
+    ranked = record["search"]["ranked"]
+    assert [entry["rank"] for entry in ranked] == [1, 2, 3]
+    assert [entry["schedule"]["name"] for entry in ranked] == names
+    assert [entry["total_elapsed_s"] for entry in ranked] == pytest.approx(totals, abs=1e-9, rel=0)
+    assert [entry["gap_s"] for entry in ranked] == pytest.approx(gaps, abs=1e-9, rel=0)
+    assert [entry["exact_tie_ranks"] for entry in ranked] == ties
+    _, base, _ = load_lab(LAB)
+    config = resolve(base, controls).configuration
+    for entry in ranked:
+        schedule = FixedSchedule(
+            entry["schedule"]["name"],
+            tuple(
+                PitStop(s["after_lap"], Compound(s["compound"])) for s in entry["schedule"]["stops"]
+            ),
+        )
+        engine_result = simulate(config, schedule)
+        assert engine_result.legal
+        assert entry["total_elapsed_s"] == engine_result.total_elapsed_s
+        assert entry["stints"] == json_value([asdict(s) for s in engine_result.stints])
+    assert ranked[0]["stints"] == record["best"]["stints"]
+    if pit == 7.1501:
+        assert ranked[1]["total_elapsed_s"] != ranked[2]["total_elapsed_s"]
+        assert format(ranked[1]["total_elapsed_s"], ".3f") == format(
+            ranked[2]["total_elapsed_s"], ".3f"
+        )

@@ -25,6 +25,14 @@ def test_explicit_only_success_and_unchanged_challenges():
         assert response.status_code == 200
         assert response.headers["cache-control"] == "no-store"
         assert response.json()["best"]["total_elapsed_s"] == pytest.approx(1113.55)
+        ranked = response.json()["search"]["ranked"]
+        assert [entry["rank"] for entry in ranked] == [1, 2, 3]
+        assert ranked[0]["stints"] == response.json()["best"]["stints"]
+        assert ranked[1]["stints"] == [
+            {"compound": "soft", "first_lap": 1, "last_lap": 6},
+            {"compound": "medium", "first_lap": 7, "last_lap": 12},
+        ]
+        assert all(entry["exact_tie_ranks"] == [] for entry in ranked)
         assert client.get("/api/v1/challenges").json() == challenges
 
 

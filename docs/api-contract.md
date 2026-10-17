@@ -267,7 +267,13 @@ Success is a JSON result/export record with:
 - `search`: completion, candidate/legal counts and counts by stops, conservative
   search work, separate benchmark work, limits, top-k, scope/tie rules, and
   full-precision `ranked` schedules/times/gaps. Schedule format is existing
-  `{name, stops: [{after_lap, compound}]}`; gap is elapsed minus best.
+  `{name, stops: [{after_lap, compound}]}`; gap is elapsed minus best. S2.1 adds
+  one-based `rank`, `stints` directly from each retained engine result, and
+  `exact_tie_ranks`: other retained ranks with exactly equal unrounded elapsed
+  time. Empty list means no exact tie among these retained entries. This is an
+  additive version-1 extension; existing fields keep their meanings. Equality
+  uses neither the S1 tie tolerance nor formatted display strings. No extra
+  optimization or simulation is run to supply these fields.
 - `best`: schedule, full-precision elapsed seconds, legality, stints and boundaries.
 - `benchmarks`: name, elapsed seconds and `improvement_s` (benchmark minus winner).
 - `scenario`: existing loader version 1 with resolved configuration and original

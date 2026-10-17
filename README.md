@@ -131,7 +131,7 @@ compound ordering picks the displayed schedule. Full precision determines all
 rankings; three-decimal display may hide smaller differences. Improvements are
 benchmark minus winner. This is synthetic fixed-schedule optimality only.
 
-Download **Export optimized scenario**, **Export winning trace** and **Export
+Download **Export optimized scenario**, **Export rank 1 winning trace** and **Export
 search record**, then move them into ignored `traces/`. Reproduce from repository
 root using the recorded limits:
 

@@ -326,3 +326,76 @@
 .lab-pit-schedule {
   padding-left: 20px;
 }
+.lab-ranked-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 20px;
+  row-gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lab-ranked-card {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 7;
+  min-width: 0;
+  border: 1px solid var(--line);
+  padding: 18px;
+}
+.lab-ranked-card h4 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--cyan);
+}
+.lab-ranked-card .lab-total {
+  font-size: clamp(24px, 2.6vw, 32px);
+  margin: 0;
+}
+.lab-ranked-tie {
+  color: var(--muted);
+}
+.lab-ranked-card .lab-pit-schedule,
+.lab-ranked-stints {
+  margin: 0;
+  padding-left: 20px;
+}
+.lab-ranked-axis-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.lab-ranked-axis,
+.lab-ranked-track {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+.lab-ranked-axis {
+  text-align: center;
+  font-family: var(--numbers);
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+.lab-ranked-segment {
+  min-width: 0;
+  text-align: center;
+  padding: 10px 0;
+  color: var(--canvas);
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: inset 0 0 0 1px var(--canvas);
+}
+.lab-ranked-precision {
+  color: var(--muted);
+  font-family: var(--numbers);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 900px) {
+  .lab-ranked-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lab-ranked-card .lab-total {
+    font-size: 32px;
+  }
+}

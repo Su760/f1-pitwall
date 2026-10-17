@@ -1,3 +1,9 @@
+# S2.1 — in progress
+
+See [scoped task/spec](s2-1-comparison.md). Implement comparison of the three
+already retained schedules, with engine stints and honest exact-tie labels.
+Authorized through verification, scoped commit/push and hosted CI.
+
 # S2 — delivered
 
 See [scoped task](s2-optimization.md) and [spec/evidence](../docs/s2-optimization-spec.md).
