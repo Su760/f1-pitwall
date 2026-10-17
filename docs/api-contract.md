@@ -190,3 +190,42 @@ Handle malformed/blocked storage without blocking play. Abort/stale-response gua
 prevent challenge switches from displaying another challenge's data. Disable and
 guard duplicate submissions; visible error/retry states preserve the selected call.
 Playback is a lap-record reveal with skip/replay and reduced-motion support.
+
+## S1 lab endpoints — lab version 1 (2026-10-17)
+
+Independent of challenge scoring; engine/model and existing endpoints unchanged.
+`GET /api/v1/lab` returns `api_version: 1`, lab settings (bounds/defaults/steps,
+grid/work limits and tie thresholds), and source identity. `POST /api/v1/lab`:
+
+```json
+{"pit_loss_s":18,"degradation_multiplier":1,"warmup_multiplier":1,"grid_size":21}
+```
+
+All fields required. Controls are strict finite numbers (no boolean/string/null):
+pit loss 0–40 seconds/stop; multipliers 0–3. Grid size is an integer 2–21.
+Both endpoints reject query parameters. POST uses the existing 1024-byte bounded
+JSON reader, rejects duplicate/unknown keys/nonfinite values, requires JSON
+content type and returns structured errors (422 invalid input or wrong content type,
+413 body too large). It accepts no client scenario, schedule, snapshot or score.
+
+Response is the exportable result: `api_version`, `lab_version`, `source`
+(model version and SHA-256 of baseline scenario/settings), `controls`, `assumptions`,
+tie thresholds, resolved loader-compatible `scenario`, `comparison`, and `grid`.
+Comparison includes named strategies, engine legality, total seconds, pit counts/
+boundaries, stints, per-lap engine records and component sums. `delta_s` is two-stop
+minus one-stop. Python returns winner/label/symbol/near-tie; JS only formats/displays.
+Grid contains inclusive axes, rows in ascending degradation order, sampled totals,
+signed differences, classifications and the total lap evaluation count.
+
+Fixed one-/two-stop schedules come from `scenarios/synthetic.json`. Both must
+finish legally through the engine. Maximum work is 441×2 + 2 simulations of 12
+laps = 10,608 lap evaluations; validate bounds before simulation. Bounded CPU work
+runs in the API thread pool. This is a local tool, not a public multi-user service
+with a global request/concurrency quota. No exhaustive optimizer is invoked.
+
+Numerical ties use |delta| ≤ 1e-9 s. Outside this tolerance, sign determines the
+faster schedule; |delta| < 0.001 s adds near-tie. The UI rounds totals to three
+decimals and gives additional digits for tiny differences. Export/recomputation
+preserves full precision. Hashes identify inputs, not authenticity. Browser abort,
+request revision and input-identity guards prevent superseded results displaying
+for newer controls, including during debounce. See [S1 spec](sensitivity-lab-spec.md).

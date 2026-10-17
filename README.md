@@ -69,9 +69,40 @@ npm run start -- --hostname 127.0.0.1 --port 3000
 The browser uses same-origin API paths. The Next.js server proxies to
 `http://127.0.0.1:8000`; configure `PITWALL_API_URL` before dev/build if using another
 local API address, and use the same value when starting that production build.
-The API accepts only known challenge/version identifiers and
-actions, never client snapshots, configurations, or scores. See the
+Challenge endpoints accept only known challenge/version identifiers and
+actions; the lab accepts only bounded controls. Neither accepts client snapshots,
+arbitrary configurations, or scores. See the
 [API contract](docs/api-contract.md) for fields, bounds, versions, and error semantics.
+
+## Synthetic sensitivity lab (S1)
+
+With the same two servers running, open [the lab](http://127.0.0.1:3000/lab),
+also linked from the arena. Change illustrative pit loss (0–40 s/stop),
+degradation (0–3×) and warm-up (0–3×), or reset to 18 / 1 / 1.
+Python simulates the existing two fixed schedules and every sampled map point.
+Degradation scales both slope and cap; warm-up includes the starting set.
+
+At default multipliers, pit loss 18 gives **1113.850 / 1124.700 s** (one-stop /
+two-stop); 7.15 gives **1103.000 / 1103.000 s**; zero gives
+**1095.850 / 1088.700 s**. Positive difference means one-stop is faster.
+The 21×21 map has text labels, keyboard cell details and horizontal scrolling
+on mobile. Changed neighbouring winners indicate sampled transitions, not exact
+crossovers or confidence. These are two schedules, not a global optimum.
+
+Export both JSON files, then move them into ignored `traces/`. From the repository
+root, recompute the comparison and verify the entire versioned result:
+
+```sh
+.venv-api/bin/python -m pitwall.sensitivity --scenario traces/lab-scenario.json --output traces/lab-comparison.json
+.venv-api/bin/python -m pitwall.sensitivity --record traces/lab-result.json --output traces/lab-verified.json
+```
+
+The scenario is also compatible with `pitwall traces/lab-scenario.json`.
+Full record verification requires the same baseline and lab settings; it checks
+source hashes, controls, resolved parameters, schedules, all lap results and grid
+points. Numeric values retain full precision; JSON whitespace may differ after
+browser export. No historical parameters or calibration are used. See the
+[lab spec](docs/sensitivity-lab-spec.md) for limits and tie conventions.
 
 ## Arena checks
 

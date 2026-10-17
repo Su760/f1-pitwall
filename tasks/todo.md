@@ -1,3 +1,10 @@
+# S1 — synthetic sensitivity lab locally verified; publication pending
+
+See [scoped task](s1-sensitivity-lab.md) and [spec](../docs/sensitivity-lab-spec.md).
+Implemented `/lab`, bounded engine/API comparisons, sampled map and offline exports.
+297 core/API, 356 core/historical and 24 desktop/mobile browser tests pass.
+Independent review and actual downloaded export replay pass. No historical calibration.
+
 # F1.3 — descriptive report delivered; historical workstream closed
 
 See [completed task](f1-3-descriptive-report.md) and [report](../docs/reports/f1-3-descriptive-report.md).
@@ -6,7 +13,8 @@ sensitivity, 19 SVGs and reconciled JSON statistics. Implementation `edd96e6` is
 pushed; all four jobs in [CI 38999607994](https://github.com/Su760/f1-pitwall/actions/runs/38999607994) pass.
 Calibration is closed for this cohort; the full circuit gate stays blocked.
 Propose only a synthetic strategy sensitivity lab with explicitly assumed
-parameters. It is not implemented; no further historical audit or RL starts.
+parameters. That proposal is now implemented separately as S1 above; no further
+historical audit or RL starts.
 
 # F1.2 — cohort audit complete; calibration unsupported
 

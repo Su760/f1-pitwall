@@ -2,11 +2,13 @@
 
 import json
 import re
+from pathlib import Path
 from typing import Any, Literal
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 from starlette.requests import ClientDisconnect
 
@@ -18,6 +20,7 @@ from apps.api.challenges import (
     evaluate,
 )
 from pitwall.actions import Action
+from pitwall.sensitivity import evaluate_lab, load_lab
 from pitwall.serialization import validate_json
 
 ActionName = Literal["stay_out", "pit_soft", "pit_medium", "pit_hard"]
@@ -30,6 +33,18 @@ class EvaluationRequest(BaseModel):
     challenge_version: int
     action: ActionName
     compare_action: ActionName | None = None
+
+
+class LabRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
+
+    pit_loss_s: float
+    degradation_multiplier: float
+    warmup_multiplier: float
+    grid_size: int
+
+
+LAB_SETTINGS = Path(__file__).resolve().parents[2] / "scenarios" / "sensitivity-lab.json"
 
 
 app = FastAPI(title="PitWall Arena", docs_url=None, redoc_url=None, openapi_url=None)
@@ -95,7 +110,7 @@ def _nonfinite(value: str) -> None:
     raise ValueError("Nonfinite JSON numbers are not accepted.")
 
 
-async def _read_request(request: Request) -> EvaluationRequest:
+async def _read_request(request: Request, model=EvaluationRequest):
     if (
         request.headers.get("content-type", "").split(";", 1)[0].lower().strip()
         != "application/json"
@@ -110,15 +125,22 @@ async def _read_request(request: Request) -> EvaluationRequest:
             body.extend(chunk)
         data = json.loads(body, object_pairs_hook=_unique_fields, parse_constant=_nonfinite)
         validate_json(data)
-        if type(data) is dict and "compare_action" in data and data["compare_action"] is None:
+        if (
+            model is EvaluationRequest
+            and type(data) is dict
+            and "compare_action" in data
+            and data["compare_action"] is None
+        ):
             raise ValueError("Omit compare_action unless it names an action.")
-        return EvaluationRequest.model_validate(data)
+        return model.model_validate(data)
     except (ValueError, UnicodeError, RecursionError, ValidationError, ClientDisconnect) as exc:
         # Never echo an untrusted body, model inputs, or server snapshot in errors.
         if isinstance(exc, ChallengeError):
             raise
         raise _invalid(
-            "Expected a valid challenge identity, integer version, and typed action."
+            "Expected finite lab controls and integer grid_size."
+            if model is LabRequest
+            else "Expected a valid challenge identity, integer version, and typed action."
         ) from exc
 
 
@@ -152,3 +174,24 @@ async def evaluation(request: Request) -> dict[str, Any]:
         Action(body.action),
         Action(body.compare_action) if body.compare_action is not None else None,
     )
+
+
+@app.get("/api/v1/lab")
+def lab_metadata(request: Request):
+    _query(request)
+    settings, _, identity = load_lab(LAB_SETTINGS)
+    return {"api_version": 1, **settings, "source": identity}
+
+
+@app.post("/api/v1/lab")
+async def lab_evaluation(request: Request):
+    _query(request)
+    body = await _read_request(request, LabRequest)
+    data = body.model_dump()
+    grid_size = data.pop("grid_size")
+    try:
+        return await run_in_threadpool(evaluate_lab, LAB_SETTINGS, data, grid_size)
+    except (ValueError, OverflowError) as exc:
+        raise _invalid(
+            "Controls or grid exceed the supported illustrative ranges/work limit."
+        ) from exc

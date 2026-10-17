@@ -930,6 +930,7 @@ export default function Arena() {
           PitWall<span>Arena</span>
         </Link>
         <div className="header-meta">
+          <Link href="/lab">Sensitivity lab</Link>
           <span className="status-dot" />
           Synthetic practice<span className="header-version">F0.5</span>
         </div>

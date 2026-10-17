@@ -1,0 +1,15 @@
+{
+  "lab_version": 1,
+  "scenario_file": "synthetic.json",
+  "controls": {
+    "pit_loss_s": {"label": "Incremental pit loss (s/stop)", "min": 0, "max": 40, "default": 18, "step": 0.01},
+    "degradation_multiplier": {"label": "Degradation multiplier", "min": 0, "max": 3, "default": 1, "step": 0.05},
+    "warmup_multiplier": {"label": "Warm-up multiplier", "min": 0, "max": 3, "default": 1, "step": 0.05}
+  },
+  "grid_default": 21,
+  "grid_max": 21,
+  "max_laps": 12,
+  "max_lap_evaluations": 10608,
+  "tie_tolerance_s": 1e-9,
+  "near_tie_s": 0.001
+}

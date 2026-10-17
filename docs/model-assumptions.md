@@ -325,3 +325,25 @@ The deprecated alias is preserved and conflicting values are flagged. Missing
 stationary duration, including earlier-than-2024-US-GP data, remains null. Neither
 measurement identifies the incremental counterfactual cost of pitting; that
 analysis is blocked. The simulator's 18 s pit loss remains a synthetic assumption.
+
+## S1 synthetic sensitivity lab
+
+S1 is a product extension, not completion of F2. It compares only the baseline
+one-stop (soft 1–6, medium 7–12) and two-stop (soft 1–4, medium 5–8, soft 9–12)
+schedules. All baseline rules, inventory, pace offsets, base time, starting tire
+and schedules stay fixed. Bounds/defaults live in `scenarios/sensitivity-lab.json`:
+incremental pit loss 0–40 s/stop (18); degradation 0–3× (1); warm-up 0–3× (1).
+These ranges are illustrative assumptions, not measured uncertainty intervals.
+
+For nonnegative multiplier D, both slope and cap multiply by D, giving
+`min(D*cap, D*slope*age) = D*min(cap, slope*age)`. This preserves curve shape;
+D=0 removes degradation. Every warm-up array entry multiplies by W, including the
+starting set. Pit loss remains an assumed incremental race-time penalty, unrelated
+to measured lane or stationary durations. Every result is an engine simulation.
+
+Full-precision difference is two-stop minus one-stop. Positive favours one-stop;
+absolute differences ≤1e-9 s are numerical ties, otherwise sign determines the
+faster schedule. Below 0.001 s the winner is labelled near-tie. Sampled grid
+transitions are not exact crossovers, probability or confidence estimates.
+No traffic, fuel, weather, driver variation or adaptive policy is introduced.
+The historical cohort calibration avenue stays closed and full circuit gate blocked.

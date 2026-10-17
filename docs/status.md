@@ -1,5 +1,34 @@
 # PitWall Arena status
 
+## S1 — synthetic strategy sensitivity lab
+
+The discoverable `/lab` compares the existing one-stop and two-stop schedules
+through the Python engine. Three bounded controls, legal outcomes, stint timelines,
+component sums, signed differences and a 21×21 text-labelled sensitivity map are
+implemented. Scenario/result exports support offline recomputation. See the
+[spec](sensitivity-lab-spec.md), [usage](../README.md#synthetic-sensitivity-lab-s1)
+and [scoped task](../tasks/s1-sensitivity-lab.md).
+
+Verified default-multiplier outcomes (one-stop / two-stop): pit18 gives
+1113.850 / 1124.700 s; pit7.15 gives 1103.000 / 1103.000 s; pit0 gives
+1095.850 / 1088.700 s. Full precision determines Python classifications with
+explicit numerical tie/near-tie conventions. The map shows sampled transitions,
+not exact crossovers, probabilities or global optimality.
+
+Local Python verification: 297 core/API tests and 356 core/historical tests,
+Ruff lint/format and wheel pass. Web lint (excluding an existing ignored local
+artifact), typecheck and production build pass. Independent read-only review
+verified 47 focused tests and 1,323 grid points against independent arithmetic
+(maximum discrepancy 4.55e-13 s). All 24 production-browser desktop/mobile cases
+pass, including the preserved 18 challenge flows. Rendered screenshots were inspected by root and reviewer.
+Actual browser downloads replay exactly; two canonical full-record builds match
+byte-for-byte. Independent final review has no outstanding findings. Publication
+CI is pending for the scoped commit.
+
+S1 uses explicitly synthetic assumptions only. Historical reports/challenges and
+the approved project spec are preserved. The full circuit gate remains blocked;
+cohort calibration is closed. No F2, imports, model fitting, adaptive planner or RL.
+
 ## F1.3 — descriptive report delivered; historical workstream closed
 
 The self-contained local report is `historical-data/f1-3-a/report.html`; run

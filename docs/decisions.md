@@ -396,3 +396,27 @@ historical workstream. Calibration remains unsupported and closed for this cohor
 the full circuit gate remains blocked. Propose only a synthetic strategy sensitivity
 lab with explicitly assumed parameters and reproducible comparisons. Do not feed
 historical summaries into simulator parameters, begin another audit, or start RL.
+
+## 2026-10-17 — S1 bounded synthetic sensitivity product
+
+Add a separate `/lab` page and bounded API using the unchanged Python engine.
+Keep parameter bounds, defaults, work limits and tie conventions in versioned
+`scenarios/sensitivity-lab.json`; preserve the approved spec, baseline scenario,
+challenges and historical gate. Scale both degradation slope/cap and all warm-up
+entries. Sample at most 21×21, two legal fixed schedules per point, without an
+optimizer or numerical interpolation of crossovers. Export resolved scenario and
+full result with model/source/settings identities; exact replay checks both.
+
+Use existing dependencies and same-origin proxy. Run simulations in the thread
+pool rather than on the async request loop. [FastAPI concurrency guidance](https://fastapi.tiangolo.com/async/)
+and [React effect cleanup guidance](https://react.dev/reference/react/useEffect)
+checked 2026-10-17. Abort plus an active-request guard handles late responses;
+render-time input identity hides stale results during debounce. Equivalent input
+text (18 → 18.0) also increments request revision so clearing the old result never
+leaves a permanent loading state. Browser regression covers this review finding.
+
+Independent read-only review verified 47 focused Python/API cases and 1,323 grid
+points against separately derived arithmetic: T1=1074+18.75D+3.1W+P and
+T2=1072+12.3D+4.4W+2P, maximum discrepancy 4.55e-13 s. These equations are review
+evidence for the frozen schedules, not an alternate runtime simulator. No historical
+fitting, strategy calibration, uncertainty model or RL. Stop at usable S1.
