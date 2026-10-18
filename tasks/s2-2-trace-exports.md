@@ -12,7 +12,7 @@ end-to-end product playtest, with no automatic feature expansion.
       valid wrong-rank rejection, ties, determinism, keyboard and stale/reset cases.
 - [x] Obtain distinct read-only backend/client reviews; inspect desktop/mobile.
 - [x] Run applicable gates; update API/export docs, S2 spec and status with evidence.
-- [ ] Inspect staged scope, commit/push without force, verify hosted CI.
+- [x] Inspect staged scope, commit/push without force, verify hosted CI.
 
 Allowed edits: `src/pitwall/lab_optimization.py`, `tests/test_lab_optimization.py`,
 `apps/api/tests/test_optimization_api.py`, `web/lib/lab.ts`,
@@ -56,4 +56,8 @@ browser downloads. Neither review has an outstanding finding. See detailed
 [S2.2 evidence](../docs/s2-optimization-spec.md#s22-verification-evidence--2026-10-18).
 Initial missing-trace regression failures were expected before implementation.
 Full-suite startup cleared first-run artifacts; regenerated files were inspected
-and replayed for final evidence. Hosted verification pending implementation push.
+and replayed for final evidence. Implementation
+[`d3abc58`](https://github.com/Su760/f1-pitwall/commit/d3abc58e42d5952e404f506bf151772e99efae90)
+is pushed; [CI 39102114593](https://github.com/Su760/f1-pitwall/actions/runs/39102114593)
+passes all four jobs (Python 3.11/3.14, historical and production arena/browser).
+S2.2 is complete; final documentation-closure commit/CI is supplied in the handoff.

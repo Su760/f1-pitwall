@@ -19,8 +19,11 @@ files match bytes. Keyboard/focus/44px targets, equivalent edits/reset and late
 responses pass; root/client reviewer inspected rendered desktop/mobile. Ordinary
 lint/typecheck/build, Ruff and packaging pass. Independent backend/client reviews
 have no outstanding findings; backend compared 20 settings and 60 retained traces,
-client independently replayed six actual downloads. Implementation/hosted CI is
-recorded in the task and final handoff.
+client independently replayed six actual downloads. Implementation
+[`d3abc58`](https://github.com/Su760/f1-pitwall/commit/d3abc58e42d5952e404f506bf151772e99efae90)
+is pushed; [CI 39102114593](https://github.com/Su760/f1-pitwall/actions/runs/39102114593)
+passes all four jobs (Python 3.11/3.14, historical and production arena/browser).
+Final documentation-closure commit/CI is supplied in the handoff.
 
 Explicit activation, bounds, 529/462 counts, full-precision ordering/tie labels,
 S1.1 map behavior and all historical gates remain unchanged. UI/UX Pro Max was

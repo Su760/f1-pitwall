@@ -1,8 +1,15 @@
-# S2.2 — in progress
+# S2.2 — delivered
 
-See [bounded task/spec](s2-2-trace-exports.md). Export the already retained
-rank-specific engine traces; no additional search or simulation. Authorized
-through verification, scoped commit/push and hosted CI.
+See [bounded task](s2-2-trace-exports.md) and [S2.2 contract/evidence](../docs/s2-optimization-spec.md#s22--retained-trace-export-contract).
+Every retained rank exports its own version-1 engine trace; tied schedules retain
+identity. 333 core/API, 129 historical and 46 production browser cases pass.
+Actual downloaded default/zero traces replay, repeated bytes and legacy winner
+match, and wrong-rank substitutions fail identity checks. Two independent reviews
+have no outstanding findings. Implementation `d3abc58` is pushed;
+[CI 39102114593](https://github.com/Su760/f1-pitwall/actions/runs/39102114593)
+passes all four jobs. No extra search/simulation, numerical or historical changes.
+Stop after S2.2. Next proposal only: a short end-to-end product playtest, recording
+friction before deciding on further changes.
 
 # S2.1 — delivered
 
@@ -12,8 +19,8 @@ comparison cards on a shared lap scale. 331 core/API, 129 historical and 42 brow
 cases pass; two independent reviews have no outstanding finding. Implementation
 `1920319` is pushed; [CI 39056718773](https://github.com/Su760/f1-pitwall/actions/runs/39056718773)
 passes all four jobs. Existing search, numerical behavior and historical evidence
-are preserved. Stop after S2.1. Next proposal only: export a chosen retained
-alternative trace, labelled by rank and verified with CLI replay.
+are preserved. The proposed rank-trace export was subsequently authorized and
+delivered separately as S2.2 above, without additional search scope.
 
 # S2 — delivered
 

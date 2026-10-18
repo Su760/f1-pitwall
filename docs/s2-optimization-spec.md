@@ -340,6 +340,11 @@ Playwright cleared first-run artifacts when starting the full suite; root/review
 used regenerated files for final inspection/replay. These tooling issues did not
 require an application fix. No unresolved failed gate is omitted.
 
+Implementation [`d3abc58`](https://github.com/Su760/f1-pitwall/commit/d3abc58e42d5952e404f506bf151772e99efae90)
+is pushed; [CI 39102114593](https://github.com/Su760/f1-pitwall/actions/runs/39102114593)
+passes all four jobs (Python 3.11/3.14, historical and production arena/browser).
+Final documentation-closure commit/CI is supplied in the handoff.
+
 Scope/limitations: no new endpoint, optimizer scope, numerical rule, trace format,
 scenario configuration or historical evidence. Still a local bounded synthetic
 model, with per-request work limits and no manual screen-reader/cross-browser
