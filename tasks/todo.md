@@ -1,3 +1,9 @@
+# S2.2 — in progress
+
+See [bounded task/spec](s2-2-trace-exports.md). Export the already retained
+rank-specific engine traces; no additional search or simulation. Authorized
+through verification, scoped commit/push and hosted CI.
+
 # S2.1 — delivered
 
 See [scoped task](s2-1-comparison.md) and [S2.1 contract/evidence](../docs/s2-optimization-spec.md#s21--retained-top-three-comparison-contract).

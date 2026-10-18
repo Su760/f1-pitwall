@@ -159,7 +159,7 @@ export default function LabOptimizer({
                       ? "Exact elapsed-time tie with rank " + entry.exact_tie_ranks.join(", ") + "."
                       : "No exact elapsed-time tie among these three."}
                   </p>
-                  <ul className="lab-pit-schedule">
+                  <ul className="lab-pit-schedule" id={"lab-rank-" + entry.rank + "-decisions"}>
                     {entry.schedule.stops.map((stop) => (
                       <li key={stop.after_lap}>
                         Pit after lap {stop.after_lap} → {stop.compound}
@@ -200,23 +200,33 @@ export default function LabOptimizer({
                     Full precision: elapsed {String(entry.total_elapsed_s)} s;
                     gap {String(entry.gap_s)} s.
                   </p>
+                  <button
+                    type="button"
+                    className="lab-button lab-ranked-export"
+                    aria-describedby={"lab-rank-" + entry.rank + "-decisions"}
+                    onClick={() => download("lab-rank-" + entry.rank + "-trace.json", entry.trace)}
+                  >
+                    Export rank {entry.rank} trace
+                  </button>
                 </li>
               ))}
             </ol>
           </section>
           <div className="lab-export">
             <h3>Reproduce this search</h3>
-            <p>Download all three files. The search record includes all three schedules and stints. The winning trace belongs to rank 1 only; it does not contain alternative traces.</p>
+            <p>Every card trace uses the same resolved scenario exported below. The search record includes all three schedules and traces. The existing winning-trace export is rank 1 only.</p>
             <div>
               <button className="lab-button" onClick={() => download("lab-optimized-scenario.json", result.scenario)}>Export optimized scenario</button>
               <button className="lab-button" onClick={() => download("lab-winning-trace.json", result.trace)}>Export rank 1 winning trace</button>
               <button className="lab-button" onClick={() => download("lab-search.json", result)}>Export search record</button>
             </div>
-            <p>From the repository root, replay the downloaded trace:</p>
-            <code>.venv-api/bin/python -m pitwall replay lab-winning-trace.json --scenario lab-optimized-scenario.json</code>
+            <p>Move downloads into ignored traces/. From the repository root, replay the winning trace:</p>
+            <code>.venv-api/bin/python -m pitwall replay traces/lab-winning-trace.json --scenario traces/lab-optimized-scenario.json</code>
+            <p>Replay an alternative, such as rank 2, with that same resolved scenario:</p>
+            <code>.venv-api/bin/python -m pitwall replay traces/lab-rank-2-trace.json --scenario traces/lab-optimized-scenario.json</code>
             <p>Recompute the search with the recorded limits:</p>
             <code>
-              .venv-api/bin/python -m pitwall optimize lab-optimized-scenario.json --top {result.search.top_k}
+              .venv-api/bin/python -m pitwall optimize traces/lab-optimized-scenario.json --top {result.search.top_k}
               {" "}--max-candidates {result.search.limits.max_candidates}
               {" "}--max-lap-evaluations {result.search.limits.max_lap_evaluations}
               {" "}--output traces/lab-recomputed-winner.json

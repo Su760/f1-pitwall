@@ -1,5 +1,39 @@
 # PitWall Arena status
 
+## S2.2 — export any retained strategy trace
+
+Every top-three card now exports its own existing-format engine trace as
+`lab-rank-N-trace.json`, with rank and pit-decision context. Each uses the same
+accompanying resolved scenario. Rank 1 equals the previous winning trace; that
+export and filename remain available. Zero-pit tied ranks keep distinct schedules,
+actions and stints. The client downloads opaque server data, with no additional
+search, simulation or endpoint. See [contract/evidence](s2-optimization-spec.md#s22--retained-trace-export-contract),
+[API/export docs](api-contract.md#s22-browser-rank-exports-2026-10-18),
+[usage](../README.md#explicit-strategy-search-s2) and [task](../tasks/s2-2-trace-exports.md).
+
+333 core/API, 129 historical and 46 production desktop/mobile browser cases pass.
+All default/zero-pit rank downloads replay with the actual downloaded scenario;
+valid wrong-rank traces fail identity checks even when elapsed time matches.
+Repeated exports are byte-identical and add zero searches. Rank-1 card/legacy
+files match bytes. Keyboard/focus/44px targets, equivalent edits/reset and late
+responses pass; root/client reviewer inspected rendered desktop/mobile. Ordinary
+lint/typecheck/build, Ruff and packaging pass. Independent backend/client reviews
+have no outstanding findings; backend compared 20 settings and 60 retained traces,
+client independently replayed six actual downloads. Implementation/hosted CI is
+recorded in the task and final handoff.
+
+Explicit activation, bounds, 529/462 counts, full-precision ordering/tie labels,
+S1.1 map behavior and all historical gates remain unchanged. UI/UX Pro Max was
+used; no unavailable tool is claimed. This remains a synthetic local tool with
+per-request budgets; no manual screen-reader/cross-browser certification. Ranks
+belong to their accompanying search/scenario; CLI validity alone does not bind a
+trace to the clicked rank. The approved spec and unrelated work are preserved.
+Historical calibration stays closed and the full circuit gate blocked.
+
+Stop after S2.2. Next proposal only: a short end-to-end product playtest, from
+arena discovery to rank export and CLI replay, recording friction before further
+feature decisions. No automatic feature expansion.
+
 ## S2.1 — retained top-three strategy comparison
 
 The explicit lab search now shows its three retained schedules in server order:
@@ -40,9 +74,9 @@ and [scoped task](../tasks/s2-1-comparison.md).
 No robustness, confidence or real-world superiority follows from these gaps.
 This remains a bounded synthetic local tool; no manual screen-reader or
 cross-browser certification is claimed. Historical calibration stays closed and
-the full circuit gate stays blocked. Stop after S2.1. One next proposal only:
-allow exporting a chosen retained alternative's engine trace with an explicit
-rank label and verified CLI replay; no additional search scope.
+the full circuit gate stays blocked. S2.1 stopped at that scope; its proposed
+rank-trace export was subsequently authorized and delivered separately as S2.2
+above, with no additional search scope.
 
 ## S2 — explicit bounded strategy search
 

@@ -69,12 +69,15 @@ test("top-three acceptance, exact ties, server order and shared lap geometry", a
   }
   const button = page.getByRole("button", { name: action, exact: true });
   await button.focus();
+  for (const rank of [1, 2, 3]) {
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("button", { name: "Export rank " + rank + " trace", exact: true })).toBeFocused();
+  }
   await page.keyboard.press("Tab");
   await expect(page.getByRole("button", { name: "Export optimized scenario" })).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("button", { name: "Export rank 1 winning trace", exact: true })).toBeFocused();
-  await page.keyboard.press("Shift+Tab");
-  await page.keyboard.press("Shift+Tab");
+  for (let i = 0; i < 5; i++) await page.keyboard.press("Shift+Tab");
   await expect(button).toBeFocused();
   await page.getByRole("button", { name: "Reset assumptions" }).click();
   await expect(page.locator(".lab-ranked-card")).toHaveCount(0);

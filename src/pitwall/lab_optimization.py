@@ -76,6 +76,9 @@ def optimize_lab(settings_path: Path, search_path: Path, controls: dict) -> dict
                         "total_elapsed_s": entry.result.total_elapsed_s,
                         "gap_s": entry.gap_s,
                         "stints": [asdict(stint) for stint in entry.result.stints],
+                        "trace": trace_document(
+                            scenario.configuration, entry.schedule, entry.result
+                        ),
                         "exact_tie_ranks": [
                             other_rank
                             for other_rank, other in enumerate(search.ranked, start=1)

@@ -242,6 +242,110 @@ is pushed; [CI 39056718773](https://github.com/Su760/f1-pitwall/actions/runs/390
 passes all four jobs (Python 3.11/3.14, historical and production arena/browser).
 The final documentation-closure commit/CI is supplied in the handoff.
 
-S2.1 stops here. Full historical gate remains blocked and cohort calibration
-remains closed. Next proposal only: export one chosen retained alternative trace,
-clearly labelled by rank, with existing CLI replay; do not expand search scope.
+S2.1 stopped at that scope; its proposed retained-trace export was subsequently
+authorized as S2.2 below. Full historical gate remains blocked and cohort
+calibration remains closed; search scope is unchanged.
+
+
+## S2.2 — retained trace export contract
+
+Authorized from S2.1 `3e513f7`. Add `trace` to every retained `search.ranked`
+entry using the existing `trace_document` with that entry's schedule/result and
+the same resolved configuration. No new search, simulation or export endpoint.
+Existing version-1 trace semantics, top-level winning trace and scenario export
+stay intact; rank 1's new trace must equal the existing top-level trace.
+
+Each card provides a native “Export rank N trace” button with rank-specific
+`lab-rank-N-trace.json` filename and the card's pit decisions as accessible
+schedule context. The client forwards the opaque Python trace through the
+existing download mechanism. Every trace uses accompanying
+`lab-optimized-scenario.json`. For example, from repository root after moving
+downloads into ignored `traces/`:
+
+```sh
+.venv-api/bin/python -m pitwall replay traces/lab-rank-2-trace.json --scenario traces/lab-optimized-scenario.json
+```
+
+Equal-time alternatives retain distinct schedules/actions/stints. A legal trace
+from another rank is still the wrong export. Verify identity with full expected
+trace comparison, in addition to CLI validity. Repeated downloads retain identical
+bytes and perform no API request. The existing `lab-winning-trace.json` download
+remains compatible and is explicitly rank 1 only.
+
+Buttons form one aligned card row; keyboard order is ranks 1/2/3 then existing
+scenario/winner/search-record exports. Visible focus and 44px touch targets use
+the existing identity. Edits (including equivalent numeric text), reset and late
+responses cannot expose superseded exports. Explicit-only search, budgets,
+full-precision ranking and exact-tie labels keep their meanings.
+
+Acceptance covers all three actual browser downloads at defaults and zero pit
+loss, CLI replay against the downloaded scenario, direct engine trace matching,
+valid wrong-rank rejection, tied rank identities, no extra computation, repeated
+exports, keyboard and desktop/mobile inspection. Independent backend/client
+reviews and applicable local/hosted gates are required. Stop after S2.2; propose
+only a short end-to-end product playtest next.
+
+
+### S2.2 verification evidence — 2026-10-18
+
+- 36 focused backend/API cases and 333 complete core/API tests pass. Six augmented
+  or new rank-trace cases initially failed with expected `KeyError: 'trace'` before
+  implementation. They now compare each trace with a fresh engine result,
+  including schedule, all actions/laps, stints and full-precision total. Valid
+  other-rank traces replay successfully but fail rank binding, including the
+  equal-time zero-pit pair. Rank 1 equals the unchanged top-level trace.
+- Spies confirm unchanged work: one optimizer call, 529 candidate simulations,
+  two benchmark simulations; no simulation in serialization/download. Both
+  preflight budgets, 462 legal count, S1 outcomes and exact-tie order remain.
+- 129 offline historical tests, Ruff lint/format and wheel build pass. Ordinary
+  web lint with retained generated artifacts, typecheck and production build pass.
+- All 46 production desktop/mobile browser cases pass without retries (18
+  challenge, 10 S1/S1.1, 8 S2, 6 S2.1 and 4 S2.2). New cases download all ranks
+  at defaults and zero pit loss, assert schedule/actions/stints/time/full-trace
+  binding and replay each actual file with the downloaded resolved scenario.
+  Swapping valid equal-time rank traces fails the identity oracle. Every rank's
+  repeated Enter/Space download matches bytes with zero additional searches;
+  rank 1 matches the legacy winning file byte-for-byte. Complete search-record
+  export equals its response including all ranked traces.
+- Keyboard tests verify visible focus, meaningful rank names and pit-decision
+  descriptions, >=44px targets, rank1/2/3 order and exit to the existing exports.
+  Download retains focus. Existing search duplicate/retry checks and S1.1 map
+  navigation remain. Equivalent edits/reset remove every rank export. A real
+  rank-2 download remains identical after a late old response; it belongs to the
+  newer zero-pit configuration. Pending-reset stale exports never reappear.
+- Root and client reviewer inspected rendered default/zero-pit desktop/mobile
+  cards: aligned export row, readable stacked buttons and distinct tied schedules.
+  Existing responsive geometry checks cover 375/768/1024/1440px. Generated
+  screenshots, downloaded JSON and browser results remain ignored under
+  `web/test-results/ranked-exports-*/` and `web/test-results/ranked-strategies-*/`.
+- Read-only backend reviewer `/root/s22_backend_review`: 36 focused cases pass;
+  differential check of 20 controls against S2.1 `3e513f7` is identical after
+  removing only the new ranked trace field. All 60 retained traces matched
+  independent serialization of their own schedule/result and replayed. No finding.
+- Read-only client reviewer `/root/s22_client_review`: inspected code/tests and
+  four actual screenshots, then independently replayed six real desktop downloads
+  against downloaded scenarios and verified identity, repeat bytes, legacy rank-1
+  compatibility and zero-pit distinct tied traces. No outstanding finding.
+  Root ran browser interaction tests; reviewer did not claim a separate browser run.
+
+UI/UX Pro Max actual instructions were read at the installed path documented
+above and its design-system, UX and React searches were used for button semantics,
+focus, visual-order keyboard flow and touch targets. Existing visual identity
+retained. Previously unavailable tools remain recorded as unavailable; none ran.
+Official references checked 2026-10-18: [WAI button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/)
+and [React common DOM components](https://react.dev/reference/react-dom/components/common).
+A guessed standalone React button reference was unavailable; the common DOM
+reference supplied the relevant event/ARIA contract instead. During verification,
+Playwright cleared first-run artifacts when starting the full suite; root/reviewer
+used regenerated files for final inspection/replay. These tooling issues did not
+require an application fix. No unresolved failed gate is omitted.
+
+Scope/limitations: no new endpoint, optimizer scope, numerical rule, trace format,
+scenario configuration or historical evidence. Still a local bounded synthetic
+model, with per-request work limits and no manual screen-reader/cross-browser
+certification. Ranks are relative to one exported search; use its accompanying
+scenario and search record. CLI replay checks trace validity/configuration, not
+which card was clicked. Full historical gate stays blocked; calibration stays
+closed. Stop after S2.2. Next proposal only: a short end-to-end product playtest
+from arena discovery through controls/search/comparison/download and CLI replay,
+recording friction before deciding on further changes.

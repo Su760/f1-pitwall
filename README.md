@@ -140,10 +140,25 @@ root using the recorded limits:
 .venv-api/bin/python -m pitwall optimize traces/lab-optimized-scenario.json --top 3 --max-candidates 600 --max-lap-evaluations 7200 --output traces/lab-recomputed-winner.json
 ```
 
+Each comparison card also offers **Export rank N trace**, saved as
+`lab-rank-N-trace.json`. The card's pit decisions identify its schedule; tied
+elapsed times can still have different schedules/actions. All three rank traces
+use the same accompanying **Export optimized scenario** file. After moving
+both downloads into ignored `traces/`, replay an alternative from repository root:
+
+```sh
+.venv-api/bin/python -m pitwall replay traces/lab-rank-2-trace.json --scenario traces/lab-optimized-scenario.json
+```
+
+The card's rank-1 trace is identical to `lab-winning-trace.json`; the previous
+winning export remains available. Repeated exports reuse the returned engine
+results and perform no additional search. Editing/reset clears every rank export.
+
 Replay verifies every saved engine record; optimize independently repeats the
 complete search and writes the same winner trace. The versioned search record
 includes controls, input hashes, resolved configuration, counts, full-precision
-top-three ranking, benchmark improvements and both exported documents. CLI JSON
+top-three ranking, benchmark improvements, resolved scenario and all three
+ranked traces, plus the compatible top-level winning trace. CLI JSON
 whitespace can differ from browser downloads; parsed trace content is identical.
 The CLI does not authenticate hashes or verify the entire search-record wrapper.
 No historical calibration, adaptive planning, stochastic model or RL. See the

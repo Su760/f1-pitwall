@@ -33,6 +33,12 @@ def test_explicit_only_success_and_unchanged_challenges():
             {"compound": "medium", "first_lap": 7, "last_lap": 12},
         ]
         assert all(entry["exact_tie_ranks"] == [] for entry in ranked)
+        assert ranked[0]["trace"] == response.json()["trace"]
+        for entry in ranked:
+            assert entry["trace"]["trace_version"] == 1
+            assert entry["trace"]["strategy"] == entry["schedule"]
+            assert entry["trace"]["result"]["stints"] == entry["stints"]
+            assert entry["trace"]["result"]["total_elapsed_s"] == entry["total_elapsed_s"]
         assert client.get("/api/v1/challenges").json() == challenges
 
 

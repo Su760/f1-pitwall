@@ -273,7 +273,12 @@ Success is a JSON result/export record with:
   time. Empty list means no exact tie among these retained entries. This is an
   additive version-1 extension; existing fields keep their meanings. Equality
   uses neither the S1 tie tolerance nor formatted display strings. No extra
-  optimization or simulation is run to supply these fields.
+  optimization or simulation is run to supply these fields. S2.2 additionally
+  supplies `trace` on each ranked entry: the existing version-1 document from
+  `trace_document(resolved configuration, entry.schedule, entry.result)`.
+  Ranked traces retain their own strategy/actions/laps/stints/time, including
+  equal-time alternatives with distinct schedules. Rank 1's trace equals the
+  unchanged top-level `trace`. This is another additive version-1 extension.
 - `best`: schedule, full-precision elapsed seconds, legality, stints and boundaries.
 - `benchmarks`: name, elapsed seconds and `improvement_s` (benchmark minus winner).
 - `scenario`: existing loader version 1 with resolved configuration and original
@@ -290,3 +295,30 @@ button; S1.1 map navigation/exit is unchanged.
 
 See [S2 specification](s2-optimization-spec.md) and
 [CLI export reproduction](../README.md#explicit-strategy-search-s2).
+
+
+### S2.2 browser rank exports (2026-10-18)
+
+Each card's native “Export rank N trace” button downloads its opaque server
+`ranked.trace` as `lab-rank-N-trace.json`, with the card's pit-decision list as
+accessible schedule description. No new endpoint, search or simulation is used.
+DOM/keyboard order is ranks 1/2/3, then existing scenario/winning/search-record
+exports; download retains button focus. The existing winning filename remains
+`lab-winning-trace.json` and contains rank 1 only. All rank traces use the same
+accompanying `lab-optimized-scenario.json` (configuration compatibility, not a
+restriction to the scenario's original benchmark strategy list).
+
+After moving downloads into ignored `traces/`, from repository root:
+
+```sh
+.venv-api/bin/python -m pitwall replay traces/lab-rank-2-trace.json --scenario traces/lab-optimized-scenario.json
+```
+
+CLI replay validates each trace's internal engine records and resolved config.
+It accepts a valid alternative trace; it does not know which UI card was clicked.
+Rank binding therefore additionally compares the downloaded strategy, actions,
+stints and total with the corresponding retained result. A valid other-rank trace
+is the wrong export even if elapsed time is exactly equal. Full search-record
+exports now include all three ranked traces; existing format versions/fields keep
+their meanings. Repeated downloads are deterministic; edits/reset remove every
+rank button and a late response cannot restore superseded exports.

@@ -61,6 +61,7 @@ export type RankedStrategy = {
   gap_s: number;
   stints: Stint[];
   exact_tie_ranks: number[];
+  trace: unknown;
 };
 export type OptimizationResult = {
   api_version: 1;

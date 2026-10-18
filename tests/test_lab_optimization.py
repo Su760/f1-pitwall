@@ -14,6 +14,7 @@ from pitwall.replay import replay_document
 from pitwall.scenario import load_scenario
 from pitwall.sensitivity import load_lab, resolve
 from pitwall.serialization import write_document
+from pitwall.trace import trace_document
 
 LAB = Path("scenarios/sensitivity-lab.json")
 SEARCH = Path("scenarios/lab-optimization.json")
@@ -175,9 +176,37 @@ def test_ranked_stints_and_exact_ties_from_retained_results(pit, totals, gaps, n
         assert engine_result.legal
         assert entry["total_elapsed_s"] == engine_result.total_elapsed_s
         assert entry["stints"] == json_value([asdict(s) for s in engine_result.stints])
+        expected_trace = trace_document(config, schedule, engine_result)
+        assert entry["trace"] == expected_trace
+        assert entry["trace"]["strategy"] == entry["schedule"]
+        assert entry["trace"]["actions"] == json_value([asdict(a) for a in engine_result.actions])
+        assert entry["trace"]["result"]["stints"] == entry["stints"]
+        assert entry["trace"]["result"]["total_elapsed_s"] == entry["total_elapsed_s"]
+        replay_document(entry["trace"], expected_config=config)
     assert ranked[0]["stints"] == record["best"]["stints"]
+    assert ranked[0]["trace"] == record["trace"]
     if pit == 7.1501:
         assert ranked[1]["total_elapsed_s"] != ranked[2]["total_elapsed_s"]
         assert format(ranked[1]["total_elapsed_s"], ".3f") == format(
             ranked[2]["total_elapsed_s"], ".3f"
         )
+
+
+@pytest.mark.parametrize("pit", [18, 0])
+def test_valid_other_rank_trace_fails_rank_binding_even_when_times_tie(pit):
+    from pitwall.serialization import verify_equal
+
+    record = optimize_lab(LAB, SEARCH, {**CONTROLS, "pit_loss_s": pit})
+    first, second, _ = record["search"]["ranked"]
+    _, base, _ = load_lab(LAB)
+    config = resolve(base, {**CONTROLS, "pit_loss_s": pit}).configuration
+    # Both are valid traces for the same scenario. Replay alone cannot bind rank.
+    replay_document(first["trace"], expected_config=config)
+    replay_document(second["trace"], expected_config=config)
+    verify_equal(first["trace"]["strategy"], first["schedule"], "rank1.strategy")
+    with pytest.raises(ValueError, match="rank1.strategy"):
+        verify_equal(second["trace"]["strategy"], first["schedule"], "rank1.strategy")
+    assert first["trace"]["actions"] != second["trace"]["actions"]
+    assert first["trace"]["result"]["stints"] != second["trace"]["result"]["stints"]
+    if pit == 0:
+        assert first["total_elapsed_s"] == second["total_elapsed_s"] == 1088.7
